@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Confirmações — Kauan & Karol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;padding:20px 14px 40px;color:#7A1325;font-family:"Cormorant Garamond",Georgia,serif;
+ background:radial-gradient(circle at 15% 10%,rgba(201,112,122,.16),transparent 35%),#EFE6DB}
+.caixa{width:min(100%,760px);margin:0 auto;padding:28px clamp(16px,4vw,32px);background:linear-gradient(180deg,#FBF7F1,#F4ECE2);
+ border-radius:22px;box-shadow:0 20px 50px rgba(78,11,23,.15),inset 0 0 0 6px rgba(255,255,255,.55),inset 0 0 0 7px rgba(122,19,37,.1)}
+h1{text-align:center;font:400 2.8rem/1 "Allura",cursive}
+.sub{text-align:center;margin:4px 0 22px;font-style:italic;opacity:.8}
+#login{display:flex;gap:8px;max-width:360px;margin:0 auto}
+input{flex:1;padding:11px 13px;font:500 1.05rem "Cormorant Garamond",serif;color:#4E0B17;background:#fff;border:1px solid rgba(122,19,37,.25);border-radius:12px;outline:none}
+input:focus{border-color:#7A1325}
+button{padding:11px 20px;font:600 1rem "Cormorant Garamond",serif;color:#FBF4EC;background:#7A1325;border:0;border-radius:999px;cursor:pointer}
+button.claro{color:#7A1325;background:none;border:1px solid rgba(122,19,37,.35)}
+.erro{min-height:1.3em;margin-top:10px;text-align:center;color:#A3172F}
+.totais{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.total{padding:14px 8px;text-align:center;background:rgba(255,255,255,.6);border:1px solid rgba(122,19,37,.15);border-radius:14px}
+.total b{display:block;font:500 2.2rem/1 "Cormorant Garamond",serif}
+.total span{font:600 .72rem/1 "Cormorant Garamond",serif;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+.barra{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.barra input{min-width:180px}
+.filtro button{padding:9px 14px}
+.filtro button[aria-pressed="true"]{background:#7A1325;color:#FBF4EC}
+.filtro button[aria-pressed="false"]{background:none;color:#7A1325;border:1px solid rgba(122,19,37,.3)}
+ul{list-style:none;display:grid;gap:8px}
+li{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 14px;background:rgba(255,255,255,.65);border:1px solid rgba(122,19,37,.12);border-radius:14px}
+li .nome{font-weight:600;font-size:1.12rem}
+li .tag{align-self:start;padding:4px 10px;border-radius:999px;font:600 .8rem/1 "Cormorant Garamond",serif;white-space:nowrap}
+li .sim{background:#7A1325;color:#FBF4EC}
+li .nao{border:1px solid rgba(122,19,37,.35)}
+li .info{grid-column:1/-1;font-size:.95rem;opacity:.8}
+li .info a{color:inherit}
+li .recado{grid-column:1/-1;font-style:italic;opacity:.9}
+.vazio{text-align:center;padding:20px;opacity:.7;font-style:italic}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="caixa">
+  <h1>Kauan &amp; Karol</h1>
+  <p class="sub">Lista de confirmações</p>
+
+  <form id="login">
+    <input id="senha" type="password" placeholder="Senha" autocomplete="current-password" required>
+    <button>Entrar</button>
+  </form>
+  <p class="erro" id="erro"></p>
+
+  <section id="painel" hidden>
+    <div class="totais">
+      <div class="total"><b id="t-pessoas">0</b><span>Pessoas</span></div>
+      <div class="total"><b id="t-conf">0</b><span>Confirmados</span></div>
+      <div class="total"><b id="t-nao">0</b><span>Não vão</span></div>
+    </div>
+    <div class="barra">
+      <input id="busca" placeholder="Buscar nome…">
+      <div class="filtro">
+        <button type="button" data-f="todos" aria-pressed="true">Todos</button>
+        <button type="button" data-f="sim" aria-pressed="false">Vão</button>
+        <button type="button" data-f="nao" aria-pressed="false">Não vão</button>
+      </div>
+      <button type="button" class="claro" id="csv">Baixar planilha</button>
+      <button type="button" class="claro" id="atualizar">Atualizar</button>
+    </div>
+    <ul id="lista"></ul>
+  </section>
+</main>
+
+<script>
+let dados = { lista: [], totais: {} }, filtro = "todos", senha = "";
+try { senha = sessionStorage.getItem("kk-senha") || ""; } catch {}
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const fone = t => t.length === 11 ? `(${t.slice(0,2)}) ${t.slice(2,7)}-${t.slice(7)}` : t;
+
+async function carregar() {
+  $("erro").textContent = "";
+  try {
+    const r = await fetch("/api/lista", { headers: { "x-senha": senha } });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.erro);
+    dados = j;
+    try { sessionStorage.setItem("kk-senha", senha); } catch {}
+    $("login").hidden = true; $("painel").hidden = false;
+    desenhar();
+  } catch (e) {
+    $("erro").textContent = e.message || "Erro ao carregar.";
+    $("login").hidden = false; $("painel").hidden = true;
+  }
+}
+
+function desenhar() {
+  $("t-pessoas").textContent = dados.totais.pessoas || 0;
+  $("t-conf").textContent = dados.totais.confirmados || 0;
+  $("t-nao").textContent = dados.totais.naoVao || 0;
+  const q = $("busca").value.trim().toLowerCase();
+  const itens = dados.lista.filter(c => (filtro === "todos" || c.vai === filtro) && c.nome.toLowerCase().includes(q));
+  $("lista").innerHTML = itens.length ? itens.map(c => `
+    <li>
+      <span class="nome">${esc(c.nome)}</span>
+      <span class="tag ${c.vai}">${c.vai === "sim" ? "Presença confirmada ✓" : "Não vai"}</span>
+      ${c.vai === "sim" ? `<span class="info"><b>${c.pessoas} ${c.pessoas == 1 ? "pessoa" : "pessoas"}</b></span>` : ""}
+      <span class="info"><a href="https://wa.me/55${esc(c.telefone)}" target="_blank" rel="noopener">${esc(fone(c.telefone))}</a> · ${new Date(c.atualizadoEm).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</span>
+      ${c.recado ? `<span class="recado">“${esc(c.recado)}”</span>` : ""}
+    </li>`).join("") : '<p class="vazio">Nenhuma resposta por aqui ainda.</p>';
+}
+
+$("login").addEventListener("submit", e => { e.preventDefault(); senha = $("senha").value; carregar(); });
+$("busca").addEventListener("input", desenhar);
+$("atualizar").addEventListener("click", carregar);
+document.querySelectorAll("[data-f]").forEach(b => b.addEventListener("click", () => {
+  filtro = b.dataset.f;
+  document.querySelectorAll("[data-f]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  desenhar();
+}));
+$("csv").addEventListener("click", () => {
+  const linhas = [["Nome","WhatsApp","Vai","Pessoas","Recado","Data"],
+    ...dados.lista.map(c => [c.nome, fone(c.telefone), c.vai === "sim" ? "Sim" : "Não", c.pessoas, c.recado || "", new Date(c.atualizadoEm).toLocaleString("pt-BR")])];
+  const csv = "﻿" + linhas.map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(";")).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  a.download = "confirmacoes-kauan-karol.csv"; a.click();
+});
+
+if (senha) carregar();
+</script>
+</body>
+</html>
