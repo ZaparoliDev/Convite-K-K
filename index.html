@@ -9,10 +9,10 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Kauan & Karol — Convite de casamento">
 <meta property="og:description" content="28/11/2026 às 15:00 · Toque para abrir o convite 💌">
-<meta property="og:image" content="https://convite-casamento-k-k.vercel.app/og-convite.jpg">
+<meta property="og:image" content="https://SEU-SITE.vercel.app/og-convite.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:url" content="https://convite-casamento-k-k.vercel.app">
+<meta property="og:url" content="https://SEU-SITE.vercel.app/">
 <meta name="twitter:card" content="summary_large_image">
 <title>Convite de casamento — Kauan & Karol</title>
 <link rel="preload" as="image" href="convite.webp">
@@ -275,7 +275,7 @@ body{grid-auto-rows:min-content;align-content:center}
 
 
 .convite{position:relative;container-type:inline-size}
-.contagem{position:absolute;left:50%;top:89.3%;translate:-50% 0;width:auto;
+.contagem{position:absolute;left:50%;top:86.6%;translate:-50% 0;width:auto;
  display:flex;align-items:baseline;justify-content:center;gap:1.1cqw;white-space:nowrap;
  color:#7A1325;font:500 2.9cqw/1 "Cormorant Garamond",serif;
  opacity:0;transition:opacity 1s .6s}
@@ -375,11 +375,32 @@ fieldset.campo{border:0}
 @keyframes carimbo{from{transform:scale(1.8) rotate(-20deg);opacity:0}}
 .rsvp-sucesso p{font:500 1.1rem/1.4 "Cormorant Garamond",serif}
 .rsvp-sucesso button{margin-top:16px;padding:10px 22px;font:600 .95rem "Cormorant Garamond",serif;color:#7A1325;background:none;border:1px solid rgba(122,19,37,.35);border-radius:999px;cursor:pointer}
+
+/* ===== Envelope esperando o toque ===== */
+.abertura-carta.parada,
+.abertura-carta.parada *:not(.carta-palco):not(.abrindo-texto):not(.anel-toque){animation-play-state:paused!important}
+.anel-toque{position:absolute;z-index:6;left:50%;bottom:52px;width:58px;height:58px;translate:-50% 0;border-radius:50%;
+ border:2px solid rgba(194,74,90,.7);pointer-events:none;animation:anel 1.6s ease-out infinite}
+.abertura-carta:not(.parada) .anel-toque{display:none}
+@keyframes anel{0%{transform:scale(1);opacity:.9}100%{transform:scale(2.1);opacity:0}}
+
+/* ===== Botão de música ===== */
+.som{position:fixed;right:16px;bottom:16px;z-index:50;width:46px;height:46px;display:grid;place-items:center;
+ color:#FBF4EC;background:linear-gradient(180deg,#8E1D2E,#6E1020);border:0;border-radius:50%;cursor:pointer;
+ box-shadow:0 8px 20px rgba(78,11,23,.32);opacity:0;pointer-events:none;transition:opacity .6s}
+body.convite-pronto .som{opacity:1;pointer-events:auto}
+.som[hidden]{display:none!important}
+.som svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.som .barras{display:flex;align-items:flex-end;gap:2px;height:16px}
+.som .barras i{width:3px;background:currentColor;border-radius:2px;animation:eq 1s ease-in-out infinite}
+.som .barras i:nth-child(2){animation-delay:-.4s}.som .barras i:nth-child(3){animation-delay:-.7s}.som .barras i:nth-child(4){animation-delay:-.2s}
+@keyframes eq{0%,100%{height:4px}50%{height:16px}}
+.som:not(.tocando) .barras,.som.tocando .mudo{display:none}
 </style>
 </head>
 <body class="carta-abrindo">
 
-<div class="abertura-carta" id="abertura-carta" aria-label="Abrindo o convite">
+<div class="abertura-carta parada" id="abertura-carta" aria-label="Abrindo o convite">
   <div class="carta-palco" aria-hidden="true">
     <div class="envelope-fundo"></div>
     <div class="carta-papel">
@@ -389,9 +410,10 @@ fieldset.campo{border:0}
     <div class="envelope-aba"></div>
     <div class="envelope-frente"></div>
     <div class="selo-carta">K&amp;K</div>
+    <div class="anel-toque"></div>
     <div class="explosao" id="explosao"></div>
   </div>
-  <p class="abrindo-texto">Abrindo o convite</p>
+  <p class="abrindo-texto" id="abrindo-texto">Toque para abrir o convite</p>
 </div>
 
 <div class="movimento-ambiente" aria-hidden="true">
@@ -408,7 +430,12 @@ fieldset.campo{border:0}
   <i class="petala-voo" style="--x:93%;--t:9px;--o:.42;--d:14.5s;--a:6.1s"></i>
 </div>
 
-<main class="convite"><img src="convite.webp" width="1582" height="2236" decoding="async" fetchpriority="high" alt="Convite de casamento de Kauan e Karol — 28/11/2026 às 15:00, Rua pequeno romance 3. Confirme presença até 20/11/2026 pelo WhatsApp (11) 93032-2747."><div class="aura" aria-hidden="true"></div><i class="brilhinho" style="--x:18%;--y:10%;--d:3.2s;--a:0s"></i><i class="brilhinho" style="--x:62%;--y:7%;--d:4s;--a:1.2s"></i><i class="brilhinho" style="--x:50%;--y:15%;--d:3.6s;--a:2.1s"></i><i class="brilhinho" style="--x:85%;--y:30%;--d:4.4s;--a:0.6s"></i><i class="brilhinho" style="--x:10%;--y:44%;--d:3.8s;--a:1.8s"></i><i class="brilhinho" style="--x:90%;--y:58%;--d:3.4s;--a:2.6s"></i><i class="brilhinho" style="--x:30%;--y:70%;--d:4.2s;--a:0.9s"></i><i class="brilhinho" style="--x:70%;--y:66%;--d:3.9s;--a:3.1s"></i><i class="brilhinho" style="--x:46%;--y:96%;--d:3.5s;--a:1.5s"></i><div class="contagem" id="contagem" aria-live="polite"></div></main>
+<main class="convite"><img src="convite.webp" width="1582" height="2236" decoding="async" fetchpriority="high" alt="Convite de casamento de Kauan e Karol — 28/11/2026 às 15:00, Rua pequeno romance 3. Confirme presença até 20/11/2026."><div class="aura" aria-hidden="true"></div><i class="brilhinho" style="--x:18%;--y:10%;--d:3.2s;--a:0s"></i><i class="brilhinho" style="--x:62%;--y:7%;--d:4s;--a:1.2s"></i><i class="brilhinho" style="--x:50%;--y:15%;--d:3.6s;--a:2.1s"></i><i class="brilhinho" style="--x:85%;--y:30%;--d:4.4s;--a:0.6s"></i><i class="brilhinho" style="--x:10%;--y:44%;--d:3.8s;--a:1.8s"></i><i class="brilhinho" style="--x:90%;--y:58%;--d:3.4s;--a:2.6s"></i><i class="brilhinho" style="--x:30%;--y:70%;--d:4.2s;--a:0.9s"></i><i class="brilhinho" style="--x:70%;--y:66%;--d:3.9s;--a:3.1s"></i><i class="brilhinho" style="--x:46%;--y:96%;--d:3.5s;--a:1.5s"></i><div class="contagem" id="contagem" aria-live="polite"></div></main>
+<audio id="musica" src="musica.mp3" loop preload="auto"></audio>
+<button class="som" id="botao-som" type="button" aria-label="Pausar ou tocar a música">
+  <span class="barras" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+  <svg class="mudo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l4 6M21 9l-4 6"/></svg>
+</button>
 <div class="acao-rsvp">
   <button class="btn-rsvp" id="abrir-rsvp" type="button">
     <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.6-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.4-7 10-7 10z"/></svg>
@@ -505,9 +532,48 @@ if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
   abertura.addEventListener("animationend", e => {
     if (e.target === abertura && e.animationName === "sumirAbertura") finalizarAbertura();
   });
-  abertura.addEventListener("click", finalizarAbertura); // toque pula a abertura
-  setTimeout(finalizarAbertura, 4600);
+  // 1º toque: abre o envelope e começa a música · 2º toque: pula a animação
+  abertura.addEventListener("click", () => {
+    if (abertura.classList.contains("parada")) {
+      abertura.classList.remove("parada");
+      document.getElementById("abrindo-texto").textContent = "Abrindo o convite";
+      Musica.tocar();
+      setTimeout(finalizarAbertura, 4600);
+    } else finalizarAbertura();
+  });
 }
+
+/* ===== Música ===== */
+const Musica = (() => {
+  const audio = document.getElementById("musica");
+  const botao = document.getElementById("botao-som");
+  const VOLUME = 0.5;
+  let querTocar = false;
+
+  audio.addEventListener("error", () => { botao.hidden = true; });
+  audio.addEventListener("play", () => botao.classList.add("tocando"));
+  audio.addEventListener("pause", () => botao.classList.remove("tocando"));
+
+  function subirVolume() {           // entrada suave
+    audio.volume = 0;
+    const t = setInterval(() => { audio.volume = Math.min(VOLUME, audio.volume + 0.05); if (audio.volume >= VOLUME) clearInterval(t); }, 120);
+  }
+  function tocar() { querTocar = true; audio.play().then(subirVolume).catch(() => {}); }
+  function pausar() { querTocar = false; audio.pause(); }
+
+  botao.addEventListener("click", e => { e.stopPropagation(); audio.paused ? tocar() : pausar(); });
+  // pausa quando a pessoa sai da aba e volta a tocar quando retorna
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) audio.pause(); else if (querTocar) audio.play().catch(() => {});
+  });
+  // sem animação (movimento reduzido): começa no primeiro toque na página
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches)
+    document.addEventListener("pointerdown", function primeiro(e) {
+      if (!e.target.closest("#botao-som")) tocar();
+      document.removeEventListener("pointerdown", primeiro);
+    });
+  return { tocar };
+})();
 
 /* ===== Contagem regressiva ===== */
 const DATA_EVENTO = new Date("2026-11-28T15:00:00-03:00");

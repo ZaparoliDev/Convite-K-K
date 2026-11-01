@@ -1,20 +1,9 @@
-const crypto = require("crypto");
 const { getDb } = require("../lib/db");
-
-function senhaCorreta(recebida) {
-  const certa = process.env.ADMIN_SENHA || "";
-  const a = Buffer.from(String(recebida || ""));
-  const b = Buffer.from(certa);
-  return certa.length > 0 && a.length === b.length && crypto.timingSafeEqual(a, b);
-}
+const { exigirSenha } = require("../lib/auth");
 
 module.exports = async (req, res) => {
   if (req.method !== "GET") return res.status(405).json({ erro: "Método não permitido" });
-
-  if (!senhaCorreta(req.headers["x-senha"])) {
-    await new Promise(r => setTimeout(r, 600)); // atrasa tentativas de adivinhar
-    return res.status(401).json({ erro: "Senha incorreta" });
-  }
+  if (!(await exigirSenha(req, res))) return;
 
   try {
     const db = await getDb();

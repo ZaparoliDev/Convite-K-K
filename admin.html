@@ -41,6 +41,17 @@ li .info{grid-column:1/-1;font-size:.95rem;opacity:.8}
 li .info a{color:inherit}
 li .recado{grid-column:1/-1;font-style:italic;opacity:.9}
 .vazio{text-align:center;padding:20px;opacity:.7;font-style:italic}
+li{position:relative}
+.excluir{grid-column:1/-1;justify-self:end;margin-top:6px;padding:6px 14px;font:600 .85rem "Cormorant Garamond",serif;
+ color:#7A1325;background:none;border:1px solid rgba(122,19,37,.3);border-radius:999px;cursor:pointer;transition:.2s}
+.excluir:hover{border-color:#7A1325}
+.excluir.certeza{color:#FBF4EC;background:#A3172F;border-color:#A3172F}
+.excluir:disabled{opacity:.6;cursor:wait}
+li.saindo{animation:sair .35s ease forwards}
+@keyframes sair{to{opacity:0;transform:translateX(30px);height:0;padding-block:0;margin:0}}
+.aviso{position:fixed;left:50%;bottom:22px;translate:-50% 0;padding:11px 20px;border-radius:999px;color:#FBF4EC;background:#7A1325;
+ font:600 .95rem "Cormorant Garamond",serif;box-shadow:0 10px 24px rgba(78,11,23,.3);opacity:0;transition:opacity .3s;pointer-events:none}
+.aviso.ver{opacity:1}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -74,6 +85,7 @@ li .recado{grid-column:1/-1;font-style:italic;opacity:.9}
     <ul id="lista"></ul>
   </section>
 </main>
+<div class="aviso" id="aviso" role="status"></div>
 
 <script>
 let dados = { lista: [], totais: {} }, filtro = "todos", senha = "";
@@ -112,6 +124,7 @@ function desenhar() {
       ${c.vai === "sim" ? `<span class="info"><b>${c.pessoas} ${c.pessoas == 1 ? "pessoa" : "pessoas"}</b></span>` : ""}
       <span class="info"><a href="https://wa.me/55${esc(c.telefone)}" target="_blank" rel="noopener">${esc(fone(c.telefone))}</a> · ${new Date(c.atualizadoEm).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</span>
       ${c.recado ? `<span class="recado">“${esc(c.recado)}”</span>` : ""}
+      <button type="button" class="excluir" data-tel="${esc(c.telefone)}" data-nome="${esc(c.nome)}">Excluir</button>
     </li>`).join("") : '<p class="vazio">Nenhuma resposta por aqui ainda.</p>';
 }
 
@@ -130,6 +143,31 @@ $("csv").addEventListener("click", () => {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
   a.download = "confirmacoes-kauan-karol.csv"; a.click();
+});
+
+function avisar(t){const a=$("aviso");a.textContent=t;a.classList.add("ver");clearTimeout(avisar.t);avisar.t=setTimeout(()=>a.classList.remove("ver"),2600);}
+
+// 1º toque: pede certeza · 2º toque (em até 4s): exclui
+$("lista").addEventListener("click", async e => {
+  const b = e.target.closest(".excluir"); if (!b) return;
+  if (!b.classList.contains("certeza")) {
+    document.querySelectorAll(".excluir.certeza").forEach(x => { x.classList.remove("certeza"); x.textContent = "Excluir"; });
+    b.classList.add("certeza"); b.textContent = "Toque de novo para excluir";
+    clearTimeout(b._t); b._t = setTimeout(() => { b.classList.remove("certeza"); b.textContent = "Excluir"; }, 4000);
+    return;
+  }
+  clearTimeout(b._t); b.disabled = true; b.textContent = "Excluindo…";
+  try {
+    const r = await fetch("/api/excluir", { method: "POST", headers: { "Content-Type": "application/json", "x-senha": senha }, body: JSON.stringify({ telefone: b.dataset.tel }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok && r.status !== 404) throw new Error(j.erro || "Erro ao excluir.");
+    const li = b.closest("li"); li.classList.add("saindo");
+    setTimeout(carregar, 350);
+    avisar(`${b.dataset.nome} foi excluído(a) da lista`);
+  } catch (err) {
+    b.disabled = false; b.classList.remove("certeza"); b.textContent = "Excluir";
+    avisar(err.message);
+  }
 });
 
 if (senha) carregar();
