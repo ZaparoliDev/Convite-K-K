@@ -28,7 +28,18 @@ module.exports = async (req, res) => {
   if (nome.length < 3) return res.status(400).json({ erro: "Informe seu nome completo." });
   if (telefone.length < 10 || telefone.length > 13) return res.status(400).json({ erro: "Informe um WhatsApp válido com DDD." });
   if (!vai) return res.status(400).json({ erro: "Diga se você vai ou não." });
-  if (vai === "sim" && !(pessoas >= 1 && pessoas <= 10)) return res.status(400).json({ erro: "Quantidade de pessoas inválida." });
+  // De 1 a 3 pessoas, contando quem confirma (o formulário só oferece essas opções)
+  if (vai === "sim" && !(pessoas >= 1 && pessoas <= 3)) return res.status(400).json({ erro: "Quantidade de pessoas inválida." });
+
+  // Acompanhantes: um nome para cada pessoa além de quem confirma (só quando vai)
+  const qtdAcomp = vai === "sim" ? pessoas - 1 : 0;
+  const recebidos = Array.isArray(corpo.acompanhantes) ? corpo.acompanhantes : [];
+  const acompanhantes = [];
+  for (let i = 0; i < qtdAcomp; i++) {
+    const n = typeof recebidos[i] === "string" ? limpar(recebidos[i], 80) : "";
+    if (n.length < 3) return res.status(400).json({ erro: `Informe o nome do ${i + 1}º acompanhante.` });
+    acompanhantes.push(n);
+  }
 
   try {
     const db = await getDb();
@@ -39,7 +50,7 @@ module.exports = async (req, res) => {
     const agora = new Date();
     const r = await col.updateOne(
       { telefone },
-      { $set: { nome, telefone, vai, pessoas, recado, atualizadoEm: agora }, $setOnInsert: { criadoEm: agora } },
+      { $set: { nome, telefone, vai, pessoas, acompanhantes, recado, atualizadoEm: agora }, $setOnInsert: { criadoEm: agora } },
       { upsert: true }
     );
     return res.status(200).json({ ok: true, atualizado: r.matchedCount > 0 });

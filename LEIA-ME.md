@@ -23,7 +23,14 @@
 - Prazo: até 20/11/2026 23:59 (Brasília). Depois disso a API recusa novos envios e o botão fica desativado.
 - O mesmo WhatsApp confirmando de novo **atualiza** a resposta anterior, sem duplicar.
 - Anti-spam: campo invisível (robôs preenchem, pessoas não).
+- Quantidade: de 1 a 3 pessoas, contando quem confirma.
+- Acompanhantes: com 2 ou 3 pessoas, o nome de cada acompanhante é obrigatório (mín. 3 letras),
+  no formulário e na API. Fica salvo no campo `acompanhantes` (lista de nomes; vazia para quem não vai).
+  Os campos somem com "Não poderei ir" e voltam preenchidos se a pessoa abrir o formulário de novo.
 - No admin: totais, busca, filtro Vão/Não vão e botão "Baixar planilha" (CSV que abre no Excel).
+- A busca do admin acha pelo nome de quem confirmou ou de qualquer acompanhante, sem ligar para acentos.
+  O CSV tem as colunas "Acompanhante 1" e "Acompanhante 2".
+- Confirmações feitas antes dos acompanhantes existirem aparecem como "nome não informado".
 
 ## Música
 - Coloque o arquivo de áudio na raiz com o nome **`musica.mp3`** (ao lado do `index.html`).

@@ -53,6 +53,11 @@ li.saindo{animation:sair .35s ease forwards}
  font:600 .95rem "Cormorant Garamond",serif;box-shadow:0 10px 24px rgba(78,11,23,.3);opacity:0;transition:opacity .3s;pointer-events:none}
 .aviso.ver{opacity:1}
 [hidden]{display:none!important}
+li .acomps{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:2px 0}
+li .acomps small{font:600 .7rem/1 "Cormorant Garamond",serif;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
+li .acomp{padding:3px 10px;font-size:.98rem;background:rgba(122,19,37,.06);border:1px solid rgba(122,19,37,.18);border-radius:999px}
+li .acomp.achou{background:#7A1325;color:#FBF4EC;border-color:#7A1325}
+li .acomps .falta{font-style:italic;opacity:.65}
 </style>
 </head>
 <body>
@@ -73,7 +78,7 @@ li.saindo{animation:sair .35s ease forwards}
       <div class="total"><b id="t-nao">0</b><span>Não vão</span></div>
     </div>
     <div class="barra">
-      <input id="busca" placeholder="Buscar nome…">
+      <input id="busca" placeholder="Buscar nome ou acompanhante…">
       <div class="filtro">
         <button type="button" data-f="todos" aria-pressed="true">Todos</button>
         <button type="button" data-f="sim" aria-pressed="false">Vão</button>
@@ -94,6 +99,9 @@ try { senha = sessionStorage.getItem("kk-senha") || ""; } catch {}
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
 const fone = t => t.length === 11 ? `(${t.slice(0,2)}) ${t.slice(2,7)}-${t.slice(7)}` : t;
+// busca sem diferenciar maiúsculas e acentos ("joao" acha "João")
+const norm = s => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const acompDe = c => Array.isArray(c.acompanhantes) ? c.acompanhantes.filter(Boolean) : [];
 
 async function carregar() {
   $("erro").textContent = "";
@@ -115,17 +123,28 @@ function desenhar() {
   $("t-pessoas").textContent = dados.totais.pessoas || 0;
   $("t-conf").textContent = dados.totais.confirmados || 0;
   $("t-nao").textContent = dados.totais.naoVao || 0;
-  const q = $("busca").value.trim().toLowerCase();
-  const itens = dados.lista.filter(c => (filtro === "todos" || c.vai === filtro) && c.nome.toLowerCase().includes(q));
-  $("lista").innerHTML = itens.length ? itens.map(c => `
+  const q = norm($("busca").value.trim());
+  const itens = dados.lista.filter(c => (filtro === "todos" || c.vai === filtro) &&
+    (norm(c.nome).includes(q) || acompDe(c).some(n => norm(n).includes(q))));
+  $("lista").innerHTML = itens.length ? itens.map(c => {
+    const acomps = c.vai === "sim" ? acompDe(c) : [];
+    const faltam = c.vai === "sim" ? Math.max(0, (Number(c.pessoas) || 1) - 1 - acomps.length) : 0;
+    const blocoAcomp = acomps.length || faltam ? `
+      <span class="acomps"><small>Acompanhantes</small>
+        ${acomps.map(n => `<span class="acomp${q && norm(n).includes(q) ? " achou" : ""}">${esc(n)}</span>`).join("")}
+        ${faltam ? `<span class="falta">${faltam === 1 ? "1 nome não informado" : `${faltam} nomes não informados`}</span>` : ""}
+      </span>` : "";
+    return `
     <li>
       <span class="nome">${esc(c.nome)}</span>
       <span class="tag ${c.vai}">${c.vai === "sim" ? "Presença confirmada ✓" : "Não vai"}</span>
       ${c.vai === "sim" ? `<span class="info"><b>${c.pessoas} ${c.pessoas == 1 ? "pessoa" : "pessoas"}</b></span>` : ""}
+      ${blocoAcomp}
       <span class="info"><a href="https://wa.me/55${esc(c.telefone)}" target="_blank" rel="noopener">${esc(fone(c.telefone))}</a> · ${new Date(c.atualizadoEm).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</span>
       ${c.recado ? `<span class="recado">“${esc(c.recado)}”</span>` : ""}
       <button type="button" class="excluir" data-tel="${esc(c.telefone)}" data-nome="${esc(c.nome)}">Excluir</button>
-    </li>`).join("") : '<p class="vazio">Nenhuma resposta por aqui ainda.</p>';
+    </li>`;
+  }).join("") : `<p class="vazio">${q ? "Ninguém encontrado com esse nome." : "Nenhuma resposta por aqui ainda."}</p>`;
 }
 
 $("login").addEventListener("submit", e => { e.preventDefault(); senha = $("senha").value; carregar(); });
@@ -137,9 +156,13 @@ document.querySelectorAll("[data-f]").forEach(b => b.addEventListener("click", (
   desenhar();
 }));
 $("csv").addEventListener("click", () => {
-  const linhas = [["Nome","WhatsApp","Vai","Pessoas","Recado","Data"],
-    ...dados.lista.map(c => [c.nome, fone(c.telefone), c.vai === "sim" ? "Sim" : "Não", c.pessoas, c.recado || "", new Date(c.atualizadoEm).toLocaleString("pt-BR")])];
-  const csv = "﻿" + linhas.map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(";")).join("\r\n");
+  const linhas = [["Nome","WhatsApp","Vai","Pessoas","Acompanhante 1","Acompanhante 2","Recado","Data"],
+    ...dados.lista.map(c => {
+      const a = c.vai === "sim" ? acompDe(c) : [];
+      return [c.nome, fone(c.telefone), c.vai === "sim" ? "Sim" : "Não", c.pessoas,
+              a[0] || "", a[1] || "", c.recado || "", new Date(c.atualizadoEm).toLocaleString("pt-BR")];
+    })];
+  const csv = "﻿" + linhas.map(l => l.map(v => `"${String(v ?? "").replace(/^[=+\-@\t\r]/, "'$&").replace(/"/g, '""')}"`).join(";")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
   a.download = "confirmacoes-kauan-karol.csv"; a.click();
