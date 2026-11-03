@@ -27,7 +27,7 @@ button.claro{color:#7A1325;background:none;border:1px solid rgba(122,19,37,.35)}
 .total b{display:block;font:500 2.2rem/1 "Cormorant Garamond",serif}
 .total span{font:600 .72rem/1 "Cormorant Garamond",serif;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
 .barra{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.barra input{min-width:180px}
+.barra input{min-width:250px}
 .filtro button{padding:9px 14px}
 .filtro button[aria-pressed="true"]{background:#7A1325;color:#FBF4EC}
 .filtro button[aria-pressed="false"]{background:none;color:#7A1325;border:1px solid rgba(122,19,37,.3)}
@@ -85,6 +85,7 @@ li .acomps .falta{font-style:italic;opacity:.65}
         <button type="button" data-f="nao" aria-pressed="false">Não vão</button>
       </div>
       <button type="button" class="claro" id="csv">Baixar planilha</button>
+      <button type="button" class="claro" id="lista-presenca">Lista de presença</button>
       <button type="button" class="claro" id="atualizar">Atualizar</button>
     </div>
     <ul id="lista"></ul>
@@ -166,6 +167,152 @@ $("csv").addEventListener("click", () => {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
   a.download = "confirmacoes-kauan-karol.csv"; a.click();
+});
+
+/* ===== Lista de presença (Excel com o logo K&K) ===== */
+const CDN_EXCELJS = "https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js";
+function carregarScript(src){
+  return new Promise((ok, falha) => {
+    if (window.ExcelJS) return ok();
+    const s = document.createElement("script");
+    s.src = src; s.onload = ok; s.onerror = () => falha(new Error("Não foi possível carregar o gerador de planilha. Verifique a internet."));
+    document.head.appendChild(s);
+  });
+}
+async function logoBase64(){
+  try {
+    const r = await fetch("logo-kk.png"); if (!r.ok) return null;
+    const b = new Uint8Array(await r.arrayBuffer()); let s = "";
+    for (let i = 0; i < b.length; i += 8192) s += String.fromCharCode(...b.subarray(i, i + 8192));
+    return btoa(s);
+  } catch { return null; }
+}
+
+// o Excel não guarda fuso: grava a data já no horário de quem baixa a planilha
+const horaLocal = d => { const t = new Date(d); return new Date(t.getTime() - t.getTimezoneOffset() * 60000); };
+
+// Cada pessoa vira uma linha: quem confirmou e, logo abaixo, seus acompanhantes
+function linhasPresenca(){
+  const fam = dados.lista.filter(c => c.vai === "sim")
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" }));
+  const linhas = [];
+  fam.forEach((c, f) => {
+    linhas.push({ nome: c.nome, familia: c.nome, tel: fone(c.telefone), titular: true, f });
+    const a = acompDe(c), total = Math.max(1, Number(c.pessoas) || 1) - 1;
+    for (let i = 0; i < total; i++)
+      linhas.push({ nome: a[i] || "(nome não informado)", familia: c.nome, tel: "", titular: false, falta: !a[i], f });
+  });
+  return { fam, linhas };
+}
+
+async function gerarListaPresenca(){
+  const VINHO = "FF7A1325", CREME = "FFF6F0E8", ROSA = "FFFBF1F2", LINHA = "FFE3C9CC";
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Kauan & Karol"; wb.created = new Date();
+  const logo = await logoBase64();
+  const idLogo = logo ? wb.addImage({ base64: logo, extension: "png" }) : null;
+  const borda = { style: "thin", color: { argb: LINHA } };
+  const bordas = { top: borda, left: borda, bottom: borda, right: borda };
+
+  // Cabeçalho com logo, nomes, data e local (centralizado sobre as colunas)
+  function cabecalho(ws, larguras, subtitulo, resumo){
+    ws.columns = larguras.map(w => ({ width: w }));
+    const n = larguras.length, ultima = String.fromCharCode(64 + n);
+    for (let r = 1; r <= 9; r++) {
+      ws.mergeCells(`A${r}:${ultima}${r}`);
+      ws.getRow(r).getCell(1).alignment = { horizontal: "center", vertical: "middle" };
+    }
+    [1, 2, 3, 4, 5].forEach(r => ws.getRow(r).height = 17.5);
+    if (idLogo != null) {
+      // centraliza o logo (80 × 100 px) em pixels sobre a largura total das colunas
+      const px = larguras.map(w => Math.round(w * 7 + 5)), total = px.reduce((s, v) => s + v, 0);
+      let alvo = (total - 80) / 2, col = 0;
+      while (col < px.length - 1 && alvo > px[col]) { alvo -= px[col]; col++; }
+      ws.addImage(idLogo, { tl: { col: col + alvo / px[col], row: 0.2 }, ext: { width: 80, height: 100 }, editAs: "oneCell" });
+    }
+    const t = ws.getCell("A6"); t.value = "Kauan & Karol";
+    t.font = { name: "Georgia", size: 24, italic: true, color: { argb: VINHO } }; ws.getRow(6).height = 34;
+    const s = ws.getCell("A7"); s.value = subtitulo;
+    s.font = { name: "Georgia", size: 12, bold: true, color: { argb: VINHO } }; ws.getRow(7).height = 20;
+    const l = ws.getCell("A8"); l.value = "28/11/2026 às 15:00  ·  Rua pequeno romance 3";
+    l.font = { name: "Georgia", size: 10.5, color: { argb: "FF9B2B3A" } };
+    const z = ws.getCell("A9"); z.value = resumo;
+    z.font = { name: "Georgia", size: 10, italic: true, color: { argb: "FF9B2B3A" } }; ws.getRow(9).height = 18;
+    ws.getRow(10).height = 8;
+  }
+  function titulos(ws, nomes, linha){
+    const r = ws.getRow(linha); r.values = nomes; r.height = 24;
+    r.eachCell(c => {
+      c.font = { name: "Georgia", size: 11, bold: true, color: { argb: CREME } };
+      c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: VINHO } };
+      c.alignment = { horizontal: "center", vertical: "middle" }; c.border = bordas;
+    });
+  }
+  function impressao(ws, linhaTitulo, paisagem){
+    ws.pageSetup = { paperSize: 9, orientation: paisagem ? "landscape" : "portrait", fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+      horizontalCentered: true, printTitlesRow: `${linhaTitulo}:${linhaTitulo}`,
+      margins: { left: .4, right: .4, top: .5, bottom: .6, header: .2, footer: .3 } };
+    ws.headerFooter.oddFooter = '&L&"Georgia,Italic"&9Kauan && Karol · 28/11/2026&R&"Georgia"&9Página &P de &N';
+    ws.views = [{ state: "frozen", ySplit: linhaTitulo, showGridLines: false }];
+  }
+
+  // Aba 1: lista de presença para a recepção
+  const { fam, linhas } = linhasPresenca();
+  const ws = wb.addWorksheet("Lista de presença", { properties: { tabColor: { argb: VINHO } } });
+  cabecalho(ws, [6, 34, 30, 18, 12], "Lista de presença",
+    `${linhas.length} ${linhas.length === 1 ? "convidado" : "convidados"} · ${fam.length} ${fam.length === 1 ? "confirmação" : "confirmações"}`);
+  titulos(ws, ["Nº", "Convidado", "Família", "WhatsApp", "Presença"], 11);
+  linhas.forEach((p, i) => {
+    const r = ws.getRow(12 + i);
+    r.values = [i + 1, p.titular ? p.nome : `     ${p.nome}`, p.familia, p.tel, "☐"];
+    r.height = 22;
+    r.eachCell({ includeEmpty: true }, (c, k) => {
+      c.border = bordas;
+      c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: p.f % 2 ? ROSA : "FFFFFFFF" } };
+      c.alignment = { vertical: "middle", horizontal: k === 1 || k === 5 ? "center" : "left" };
+      c.font = { name: "Georgia", size: 11, color: { argb: "FF4E0B17" } };
+    });
+    r.getCell(2).font = { name: "Georgia", size: 11, bold: p.titular, italic: p.falta, color: { argb: p.falta ? "FF9B8A8C" : "FF4E0B17" } };
+    r.getCell(3).font = { name: "Georgia", size: 10, color: { argb: "FF9B2B3A" } };
+    r.getCell(5).font = { name: "Segoe UI Symbol", size: 15, color: { argb: VINHO } };
+  });
+  if (!linhas.length) { ws.mergeCells("A12:E12"); ws.getCell("A12").value = "Nenhuma presença confirmada ainda."; ws.getCell("A12").alignment = { horizontal: "center" }; }
+  impressao(ws, 11, false);
+
+  // Aba 2: todas as respostas (inclui quem não vai e os recados)
+  const wr = wb.addWorksheet("Todas as respostas");
+  const vao = dados.lista.filter(c => c.vai === "sim").length;
+  cabecalho(wr, [26, 17, 8, 10, 22, 22, 40, 18], "Todas as respostas",
+    `${dados.lista.length} respostas · ${vao} vão · ${dados.lista.length - vao} não vão`);
+  titulos(wr, ["Nome", "WhatsApp", "Vai", "Pessoas", "Acompanhante 1", "Acompanhante 2", "Recado", "Data"], 11);
+  dados.lista.forEach((c, i) => {
+    const a = c.vai === "sim" ? acompDe(c) : [];
+    const r = wr.getRow(12 + i);
+    r.values = [c.nome, fone(c.telefone), c.vai === "sim" ? "Sim" : "Não", c.vai === "sim" ? Number(c.pessoas) || 1 : 0,
+                a[0] || "", a[1] || "", c.recado || "", horaLocal(c.atualizadoEm)];
+    r.eachCell({ includeEmpty: true }, (cel, k) => {
+      cel.border = bordas;
+      cel.fill = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 ? ROSA : "FFFFFFFF" } };
+      cel.font = { name: "Georgia", size: 10.5, color: { argb: "FF4E0B17" } };
+      cel.alignment = { vertical: "top", wrapText: k === 7, horizontal: k === 3 || k === 4 ? "center" : "left" };
+    });
+    if (c.vai !== "sim") r.getCell(3).font = { name: "Georgia", size: 10.5, italic: true, color: { argb: "FF9B8A8C" } };
+    r.getCell(8).numFmt = "dd/mm/yyyy hh:mm";
+  });
+  impressao(wr, 11, true);
+
+  const buf = await wb.xlsx.writeBuffer();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+  a.download = "lista-de-presenca-kauan-karol.xlsx"; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+$("lista-presenca").addEventListener("click", async () => {
+  const b = $("lista-presenca"), texto = b.textContent;
+  b.disabled = true; b.textContent = "Gerando…";
+  try { await carregarScript(CDN_EXCELJS); await gerarListaPresenca(); avisar("Lista de presença baixada ✓"); }
+  catch (e) { avisar(e.message || "Erro ao gerar a lista."); }
+  finally { b.disabled = false; b.textContent = texto; }
 });
 
 function avisar(t){const a=$("aviso");a.textContent=t;a.classList.add("ver");clearTimeout(avisar.t);avisar.t=setTimeout(()=>a.classList.remove("ver"),2600);}
