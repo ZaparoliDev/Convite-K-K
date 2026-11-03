@@ -31,6 +31,12 @@
 - A busca do admin acha pelo nome de quem confirmou ou de qualquer acompanhante, sem ligar para acentos.
   O CSV tem as colunas "Acompanhante 1" e "Acompanhante 2".
 - Confirmações feitas antes dos acompanhantes existirem aparecem como "nome não informado".
+- O formulário avisa que apenas 1 pessoa da família precisa preencher; os demais entram como acompanhantes.
+- Botão "Lista de presença" no admin: baixa um Excel (.xlsx) com o logo K&K (`logo-kk.png`, na raiz) e duas abas:
+  - **Lista de presença**: uma linha por convidado (quem confirmou em negrito e os acompanhantes logo abaixo),
+    em ordem alfabética, com a coluna "Presença" (☐) para marcar na entrada. Pronta para imprimir em A4.
+  - **Todas as respostas**: inclui quem não vai, os recados e a data de cada resposta.
+  - O gerador (ExcelJS) é carregado da internet na hora do clique, então o admin precisa estar online.
 
 ## Música
 - Coloque o arquivo de áudio na raiz com o nome **`musica.mp3`** (ao lado do `index.html`).
