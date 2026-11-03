@@ -6,8 +6,11 @@
 - `api/confirmar.js`: recebe a confirmação (POST)
 - `api/lista.js`: devolve a lista para o admin (GET, cabeçalho `x-senha`)
 - `api/excluir.js`: exclui uma confirmação (POST, cabeçalho `x-senha`)
+- `api/editar.js`: os noivos corrigem uma confirmação (POST, cabeçalho `x-senha`)
 - `lib/auth.js`: verificação da senha do admin
 - `lib/db.js`: conexão com o MongoDB
+- `lib/validar.js`: regras de validação, as mesmas para o formulário e para a edição
+- `logo-kk.png`: logo usado na lista de presença
 
 ## Como publicar
 1. MongoDB Atlas: crie um cluster grátis (M0), um usuário e libere o acesso de rede `0.0.0.0/0`.
@@ -45,6 +48,13 @@
   dá a música, porque os navegadores bloqueiam áudio sem interação.
 - O botão redondo no canto liga e desliga a música. A música pausa sozinha quando a pessoa sai da aba.
 - Sem `musica.mp3`, o botão some e o resto funciona normalmente.
+
+## Editar no admin
+- Cada resposta tem o botão "Editar": dá para mudar nome, WhatsApp, se vai ou não, a quantidade de pessoas,
+  os nomes dos acompanhantes e o recado. As regras são as mesmas do formulário (acompanhantes obrigatórios).
+- Funciona também depois do prazo de 20/11.
+- Não deixa trocar o WhatsApp para um número que já tem outra confirmação.
+- A data da resposta do convidado é mantida; a lista mostra "editado pelos noivos" em quem foi alterado.
 
 ## Excluir no admin
 - Cada resposta tem o botão "Excluir". O 1º toque pede confirmação, e o 2º (em até 4 s) exclui de vez.

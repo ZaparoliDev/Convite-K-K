@@ -58,6 +58,40 @@ li .acomps small{font:600 .7rem/1 "Cormorant Garamond",serif;letter-spacing:.14e
 li .acomp{padding:3px 10px;font-size:.98rem;background:rgba(122,19,37,.06);border:1px solid rgba(122,19,37,.18);border-radius:999px}
 li .acomp.achou{background:#7A1325;color:#FBF4EC;border-color:#7A1325}
 li .acomps .falta{font-style:italic;opacity:.65}
+li .acoes{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+li .acoes .excluir{margin-top:0}
+.editar{padding:6px 14px;font:600 .85rem "Cormorant Garamond",serif;color:#7A1325;background:none;border:1px solid rgba(122,19,37,.3);border-radius:999px;cursor:pointer}
+.editar:hover{border-color:#7A1325}
+li .editado{font-style:italic;opacity:.75}
+/* ===== Editar confirmação ===== */
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(46,8,16,.55);backdrop-filter:blur(5px)}
+.modal-caixa{position:relative;width:min(100%,440px);max-height:calc(100svh - 32px);overflow:auto;padding:26px 24px 22px;
+ background:linear-gradient(180deg,#FBF7F1,#F4ECE2);border-radius:22px;box-shadow:0 30px 70px rgba(30,4,10,.45),inset 0 0 0 6px rgba(255,255,255,.55),inset 0 0 0 7px rgba(122,19,37,.12);
+ animation:subir .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes subir{from{opacity:0;transform:translateY(16px) scale(.97)}}
+.modal-caixa h2{text-align:center;font:400 2.3rem/1 "Allura",cursive}
+.modal-caixa .sub{margin:4px 0 16px}
+.modal-fechar{position:absolute;top:10px;right:12px;width:34px;height:34px;padding:0;font-size:1.6rem;line-height:1;color:#7A1325;background:none;opacity:.6}
+#form-editar{display:grid;gap:12px}
+#form-editar label,#form-editar legend{display:block;margin-bottom:5px;font:600 .72rem/1 "Cormorant Garamond",serif;letter-spacing:.16em;text-transform:uppercase;opacity:.8}
+#form-editar input,#form-editar select,#form-editar textarea{width:100%;padding:10px 12px;font:500 1.05rem "Cormorant Garamond",serif;color:#4E0B17;background:#fff;border:1px solid rgba(122,19,37,.25);border-radius:12px;outline:none}
+#form-editar textarea{height:64px;resize:none}
+#form-editar input:focus,#form-editar select:focus,#form-editar textarea:focus{border-color:#7A1325}
+#form-editar input.invalido{border-color:#A3172F;box-shadow:0 0 0 3px rgba(163,23,47,.12)}
+#form-editar fieldset{border:0}
+.opcoes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opcoes label{margin:0!important;opacity:1!important}
+.opcoes input{position:absolute;opacity:0;pointer-events:none}
+.opcoes span{display:block;padding:10px 8px;text-align:center;font:600 1rem/1.1 "Cormorant Garamond",serif;letter-spacing:0;text-transform:none;
+ border:1px solid rgba(122,19,37,.25);border-radius:12px;background:rgba(255,255,255,.6);cursor:pointer}
+.opcoes input:checked+span{background:#7A1325;color:#FBF4EC;border-color:#7A1325}
+.opcoes input:focus-visible+span{box-shadow:0 0 0 3px rgba(122,19,37,.2)}
+#e-acomps{display:grid;gap:10px}
+#e-acomps:empty{display:none}
+#e-acomps .obrig{margin-left:6px;font-style:italic;letter-spacing:0;text-transform:none;color:#A3172F}
+.modal-botoes{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+.modal-botoes button:disabled{opacity:.6;cursor:wait}
+#e-erro{min-height:1.2em;text-align:center;color:#A3172F}
 </style>
 </head>
 <body>
@@ -92,6 +126,36 @@ li .acomps .falta{font-style:italic;opacity:.65}
   </section>
 </main>
 <div class="aviso" id="aviso" role="status"></div>
+
+<div class="modal" id="modal-editar" hidden role="dialog" aria-modal="true" aria-labelledby="e-titulo">
+  <div class="modal-caixa">
+    <button type="button" class="modal-fechar" data-fechar aria-label="Fechar">&times;</button>
+    <h2 id="e-titulo">Editar confirmação</h2>
+    <p class="sub">As mudanças aparecem na lista e nas planilhas</p>
+    <form id="form-editar" novalidate>
+      <div><label for="e-nome">Nome completo</label><input id="e-nome" maxlength="80" autocomplete="off"></div>
+      <div><label for="e-tel">WhatsApp</label><input id="e-tel" type="tel" inputmode="numeric" maxlength="16" placeholder="(11) 90000-0000"></div>
+      <fieldset>
+        <legend>Vai?</legend>
+        <div class="opcoes">
+          <label><input type="radio" name="e-vai" value="sim"><span>Vai</span></label>
+          <label><input type="radio" name="e-vai" value="nao"><span>Não vai</span></label>
+        </div>
+      </fieldset>
+      <div id="e-bloco-pessoas">
+        <label for="e-pessoas">Quantas pessoas (contando quem confirmou)</label>
+        <select id="e-pessoas"><option>1</option><option>2</option><option>3</option></select>
+      </div>
+      <div id="e-acomps"></div>
+      <div><label for="e-recado">Recado</label><textarea id="e-recado" maxlength="300"></textarea></div>
+      <p id="e-erro" role="alert"></p>
+      <div class="modal-botoes">
+        <button type="button" class="claro" data-fechar>Cancelar</button>
+        <button type="submit" id="e-salvar">Salvar alterações</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script>
 let dados = { lista: [], totais: {} }, filtro = "todos", senha = "";
@@ -141,9 +205,12 @@ function desenhar() {
       <span class="tag ${c.vai}">${c.vai === "sim" ? "Presença confirmada ✓" : "Não vai"}</span>
       ${c.vai === "sim" ? `<span class="info"><b>${c.pessoas} ${c.pessoas == 1 ? "pessoa" : "pessoas"}</b></span>` : ""}
       ${blocoAcomp}
-      <span class="info"><a href="https://wa.me/55${esc(c.telefone)}" target="_blank" rel="noopener">${esc(fone(c.telefone))}</a> · ${new Date(c.atualizadoEm).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</span>
+      <span class="info"><a href="https://wa.me/55${esc(c.telefone)}" target="_blank" rel="noopener">${esc(fone(c.telefone))}</a> · ${new Date(c.atualizadoEm).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}${c.editadoEm ? ` <span class="editado">· editado pelos noivos</span>` : ""}</span>
       ${c.recado ? `<span class="recado">“${esc(c.recado)}”</span>` : ""}
-      <button type="button" class="excluir" data-tel="${esc(c.telefone)}" data-nome="${esc(c.nome)}">Excluir</button>
+      <span class="acoes">
+        <button type="button" class="editar" data-tel="${esc(c.telefone)}">Editar</button>
+        <button type="button" class="excluir" data-tel="${esc(c.telefone)}" data-nome="${esc(c.nome)}">Excluir</button>
+      </span>
     </li>`;
   }).join("") : `<p class="vazio">${q ? "Ninguém encontrado com esse nome." : "Nenhuma resposta por aqui ainda."}</p>`;
 }
@@ -314,6 +381,76 @@ $("lista-presenca").addEventListener("click", async () => {
   catch (e) { avisar(e.message || "Erro ao gerar a lista."); }
   finally { b.disabled = false; b.textContent = texto; }
 });
+
+/* ===== Editar confirmação ===== */
+const Editar = (() => {
+  const modal = $("modal-editar"), form = $("form-editar"), lista = $("e-acomps"), erro = $("e-erro");
+  let original = null, memoria = [];
+  const vai = () => form.querySelector('[name="e-vai"]:checked')?.value;
+  const qtd = () => vai() === "sim" ? Math.max(0, Math.min(2, (parseInt($("e-pessoas").value, 10) || 1) - 1)) : 0;
+  const mascara = v => { const d = v.replace(/\D/g, "").slice(0, 11);
+    return d.length > 6 ? `(${d.slice(0,2)}) ${d.slice(2, d.length-4)}-${d.slice(-4)}` : d.length > 2 ? `(${d.slice(0,2)}) ${d.slice(2)}` : d; };
+
+  function montar(){
+    $("e-bloco-pessoas").hidden = vai() !== "sim";
+    const n = qtd();
+    if (lista.children.length === n) return;
+    lista.innerHTML = "";
+    for (let i = 0; i < n; i++) {
+      const w = document.createElement("div");
+      w.innerHTML = `<label for="e-acomp-${i}">Nome do ${i + 1}º acompanhante<span class="obrig">* obrigatório</span></label>
+        <input id="e-acomp-${i}" data-i="${i}" maxlength="80" autocomplete="off">`;
+      w.querySelector("input").value = memoria[i] || "";
+      lista.appendChild(w);
+    }
+  }
+  function abrir(tel){
+    const c = dados.lista.find(x => x.telefone === tel); if (!c) return;
+    original = c.telefone; memoria = [...acompDe(c)];
+    $("e-nome").value = c.nome; $("e-tel").value = mascara(c.telefone); $("e-recado").value = c.recado || "";
+    form.querySelector(`[name="e-vai"][value="${c.vai === "sim" ? "sim" : "nao"}"]`).checked = true;
+    $("e-pessoas").value = String(Math.min(3, Math.max(1, Number(c.pessoas) || 1)));
+    lista.innerHTML = ""; montar(); erro.textContent = "";
+    modal.hidden = false; $("e-nome").focus();
+  }
+  function fechar(){ modal.hidden = true; original = null; }
+
+  form.addEventListener("change", montar);
+  form.addEventListener("input", () => { erro.textContent = ""; });
+  lista.addEventListener("input", e => { if (e.target.dataset.i != null) { memoria[+e.target.dataset.i] = e.target.value; e.target.classList.remove("invalido"); } });
+  $("e-tel").addEventListener("input", e => e.target.value = mascara(e.target.value));
+  modal.addEventListener("click", e => { if (e.target === modal || e.target.closest("[data-fechar]")) fechar(); });
+  addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) fechar(); });
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault(); erro.textContent = "";
+    const corpo = {
+      telefoneOriginal: original,
+      nome: $("e-nome").value.replace(/\s+/g, " ").trim(),
+      telefone: $("e-tel").value,
+      vai: vai(),
+      pessoas: vai() === "sim" ? $("e-pessoas").value : "1",
+      acompanhantes: [...lista.querySelectorAll("input")].map(i => i.value.replace(/\s+/g, " ").trim()),
+      recado: $("e-recado").value,
+    };
+    if (corpo.nome.length < 3) return erro.textContent = "Informe o nome completo.";
+    if (corpo.telefone.replace(/\D/g, "").length < 10) return erro.textContent = "Informe o WhatsApp com DDD.";
+    const ins = lista.querySelectorAll("input");
+    for (let i = 0; i < corpo.acompanhantes.length; i++)
+      if (corpo.acompanhantes[i].length < 3) { ins[i].classList.add("invalido"); ins[i].focus(); return erro.textContent = `Informe o nome do ${i + 1}º acompanhante.`; }
+
+    const b = $("e-salvar"); b.disabled = true; b.textContent = "Salvando…";
+    try {
+      const r = await fetch("/api/editar", { method: "POST", headers: { "Content-Type": "application/json", "x-senha": senha }, body: JSON.stringify(corpo) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.erro || "Não foi possível salvar.");
+      fechar(); await carregar(); avisar("Alterações salvas ✓");
+    } catch (err) { erro.textContent = err.message === "Failed to fetch" ? "Sem conexão. Tente novamente." : err.message; }
+    finally { b.disabled = false; b.textContent = "Salvar alterações"; }
+  });
+  return { abrir };
+})();
+$("lista").addEventListener("click", e => { const b = e.target.closest(".editar"); if (b) Editar.abrir(b.dataset.tel); });
 
 function avisar(t){const a=$("aviso");a.textContent=t;a.classList.add("ver");clearTimeout(avisar.t);avisar.t=setTimeout(()=>a.classList.remove("ver"),2600);}
 
