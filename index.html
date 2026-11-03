@@ -362,6 +362,7 @@ fieldset.campo{border:0}
 .opcoes input:checked+span{background:#7A1325;color:#FBF4EC;border-color:#7A1325}
 .opcoes input:focus-visible+span{box-shadow:0 0 0 3px rgba(122,19,37,.2)}
 .campo.oculto{display:none}
+#escolha-pessoas>label{display:block;margin-bottom:5px;font:600 .74rem/1 "Cormorant Garamond",serif;letter-spacing:.16em;text-transform:uppercase;opacity:.8}
 .isca{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .rsvp-erro{min-height:1.2em;font:500 .95rem/1.3 "Cormorant Garamond",serif;color:#A3172F;text-align:center}
 .rsvp-enviar{margin-top:2px;padding:13px;font:600 1.05rem/1 "Cormorant Garamond",serif;letter-spacing:.08em;color:#FBF4EC;
@@ -488,7 +489,7 @@ body.convite-pronto .obs-convite{opacity:.85}
     <p class="sub" id="rsvp-sub">Responda até 20/11/2026 ♡</p>
 
     <form id="form-rsvp" novalidate>
-      <p class="aviso-familia">
+      <p class="aviso-familia" id="aviso-familia">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9.5" r="2.4"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.6 14.6c.7-.4 1.5-.6 2.4-.6 2.2 0 3.8 1.5 4.3 4"/></svg>
         <span>Apenas <b>1 pessoa da família</b> precisa preencher. Inclua os demais como acompanhantes ♡</span>
       </p>
@@ -508,10 +509,12 @@ body.convite-pronto .obs-convite{opacity:.85}
         </div>
       </fieldset>
       <div class="campo" id="campo-pessoas">
-        <label for="f-pessoas">Quantas pessoas (contando você)</label>
-        <select id="f-pessoas" name="pessoas">
-          <option>1</option><option>2</option><option>3</option>
-        </select>
+        <div id="escolha-pessoas">
+          <label for="f-pessoas">Quantas pessoas (contando você)</label>
+          <select id="f-pessoas" name="pessoas">
+            <option>1</option><option>2</option><option>3</option>
+          </select>
+        </div>
         <div class="acompanhantes" id="acompanhantes" aria-live="polite"></div>
         <p class="obs-form"><b>OBS:</b> Convidado não convida ♡</p>
       </div>
@@ -738,7 +741,19 @@ if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
 
   // nomes digitados ficam guardados mesmo se a pessoa diminuir e aumentar a quantidade
   let memoria = [];
-  const qtdAcomp = () => Math.max(0, Math.min(2, (parseInt(form.pessoas.value, 10) || 1) - 1));
+  // Limite definido pelos noivos no admin (padrão: 2 acompanhantes, ou seja, até 3 pessoas)
+  let maxAcomp = 2;
+  const qtdAcomp = () => Math.max(0, Math.min(maxAcomp, (parseInt(form.pessoas.value, 10) || 1) - 1));
+  function aplicarLimite(n){
+    const v = Math.trunc(Number(n));
+    maxAcomp = Number.isFinite(v) ? Math.max(0, Math.min(9, v)) : 2;
+    const atual = Math.min(maxAcomp + 1, parseInt(form.pessoas.value, 10) || 1);
+    form.pessoas.innerHTML = Array.from({ length: maxAcomp + 1 }, (_, i) => `<option>${i + 1}</option>`).join("");
+    form.pessoas.value = String(atual);
+    document.getElementById("escolha-pessoas").hidden = maxAcomp === 0;   // sem acompanhantes: nem pergunta
+    document.getElementById("aviso-familia").hidden = maxAcomp === 0;
+    montarAcomp();
+  }
   const nomesAcomp = () => [...listaAcomp.querySelectorAll("input")].map(i => i.value.replace(/\s+/g, " ").trim());
 
   function montarAcomp(forcar){
@@ -774,12 +789,14 @@ if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
     if (new Date() > PRAZO && !r) { btn.disabled = true; document.getElementById("texto-btn-rsvp").textContent = "Confirmações encerradas"; }
   }
   marcarBotao();
+  fetch("/api/config", { cache: "no-store" }).then(r => r.ok ? r.json() : null)
+    .then(j => { if (j && j.maxAcompanhantes != null) aplicarLimite(j.maxAcompanhantes); }).catch(() => {});
 
   function abrir(){
     const r = guardar.ler();
     if (r) {
       form.nome.value = r.nome; tel.value = r.telefone; form.vai.value = r.vai;
-      form.pessoas.value = String(Math.min(3, Math.max(1, Number(r.pessoas) || 1)));
+      form.pessoas.value = String(Math.min(maxAcomp + 1, Math.max(1, Number(r.pessoas) || 1)));
       memoria = Array.isArray(r.acompanhantes) ? [...r.acompanhantes] : [];
     }
     form.hidden = false; sucesso.hidden = true; erro.textContent = "";

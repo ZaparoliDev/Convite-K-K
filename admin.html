@@ -92,6 +92,18 @@ li .editado{font-style:italic;opacity:.75}
 .modal-botoes{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
 .modal-botoes button:disabled{opacity:.6;cursor:wait}
 #e-erro{min-height:1.2em;text-align:center;color:#A3172F}
+/* ===== Ajuste do limite de acompanhantes ===== */
+.ajuste{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:6px 12px;margin-bottom:16px;padding:14px 16px;
+ background:rgba(255,255,255,.6);border:1px solid rgba(122,19,37,.15);border-radius:14px}
+.ajuste label{font:600 .74rem/1 "Cormorant Garamond",serif;letter-spacing:.16em;text-transform:uppercase;opacity:.85}
+.ajuste select{padding:8px 12px;font:600 1.05rem "Cormorant Garamond",serif;color:#4E0B17;background:#fff;border:1px solid rgba(122,19,37,.25);border-radius:12px;outline:none}
+.ajuste select:focus{border-color:#7A1325}
+.ajuste button{padding:9px 18px}
+.ajuste button:disabled{opacity:.45;cursor:default}
+.ajuste .desc{grid-column:1/-1;font-size:.98rem;font-style:italic;opacity:.85}
+.ajuste .desc b{font-style:normal}
+@media (max-width:520px){.ajuste{grid-template-columns:1fr auto}.ajuste label{grid-column:1/-1}}
+li .acima{padding:2px 8px;margin-left:6px;font:600 .75rem/1 "Cormorant Garamond",serif;color:#A3172F;border:1px dashed rgba(163,23,47,.5);border-radius:999px}
 </style>
 </head>
 <body>
@@ -110,6 +122,16 @@ li .editado{font-style:italic;opacity:.75}
       <div class="total"><b id="t-pessoas">0</b><span>Pessoas</span></div>
       <div class="total"><b id="t-conf">0</b><span>Confirmados</span></div>
       <div class="total"><b id="t-nao">0</b><span>Não vão</span></div>
+    </div>
+    <div class="ajuste">
+      <label for="cfg-acomp">Acompanhantes por convite</label>
+      <select id="cfg-acomp" aria-describedby="cfg-desc">
+        <option value="0">Nenhum</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
+        <option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option>
+        <option value="8">8</option><option value="9">9</option>
+      </select>
+      <button type="button" id="cfg-salvar" disabled>Salvar</button>
+      <p class="desc" id="cfg-desc"></p>
     </div>
     <div class="barra">
       <input id="busca" placeholder="Buscar nome ou acompanhante…">
@@ -167,6 +189,9 @@ const fone = t => t.length === 11 ? `(${t.slice(0,2)}) ${t.slice(2,7)}-${t.slice
 // busca sem diferenciar maiúsculas e acentos ("joao" acha "João")
 const norm = s => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const acompDe = c => Array.isArray(c.acompanhantes) ? c.acompanhantes.filter(Boolean) : [];
+// limite de acompanhantes definido pelos noivos (o formulário dos convidados segue esse número)
+let limite = 2;
+const TETO = 9;
 
 async function carregar() {
   $("erro").textContent = "";
@@ -175,6 +200,8 @@ async function carregar() {
     const j = await r.json();
     if (!r.ok) throw new Error(j.erro);
     dados = j;
+    try { const c = await (await fetch("/api/config", { cache: "no-store" })).json(); if (c.maxAcompanhantes != null) limite = Number(c.maxAcompanhantes); } catch {}
+    mostrarLimite(limite);
     try { sessionStorage.setItem("kk-senha", senha); } catch {}
     $("login").hidden = true; $("painel").hidden = false;
     desenhar();
@@ -203,7 +230,7 @@ function desenhar() {
     <li>
       <span class="nome">${esc(c.nome)}</span>
       <span class="tag ${c.vai}">${c.vai === "sim" ? "Presença confirmada ✓" : "Não vai"}</span>
-      ${c.vai === "sim" ? `<span class="info"><b>${c.pessoas} ${c.pessoas == 1 ? "pessoa" : "pessoas"}</b></span>` : ""}
+      ${c.vai === "sim" ? `<span class="info"><b>${c.pessoas} ${c.pessoas == 1 ? "pessoa" : "pessoas"}</b>${Number(c.pessoas) > limite + 1 ? `<span class="acima" title="Confirmou antes do limite atual">acima do limite</span>` : ""}</span>` : ""}
       ${blocoAcomp}
       <span class="info"><a href="https://wa.me/55${esc(c.telefone)}" target="_blank" rel="noopener">${esc(fone(c.telefone))}</a> · ${new Date(c.atualizadoEm).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}${c.editadoEm ? ` <span class="editado">· editado pelos noivos</span>` : ""}</span>
       ${c.recado ? `<span class="recado">“${esc(c.recado)}”</span>` : ""}
@@ -223,12 +250,40 @@ document.querySelectorAll("[data-f]").forEach(b => b.addEventListener("click", (
   document.querySelectorAll("[data-f]").forEach(x => x.setAttribute("aria-pressed", x === b));
   desenhar();
 }));
+// quantas colunas de acompanhante as planilhas precisam: o limite atual ou o maior grupo já salvo
+const colunasAcomp = () => Math.max(1, limite, ...dados.lista.map(c => c.vai === "sim" ? acompDe(c).length : 0));
+
+function descreverLimite(n){
+  return n === 0 ? "Cada convidado confirma só a si mesmo (o formulário não pergunta quantas pessoas)."
+    : `Os convidados poderão escolher de <b>1 a ${n + 1} pessoas</b> (contando quem confirma) e preencher ${n === 1 ? "o nome do acompanhante" : `até ${n} nomes de acompanhantes`}.`;
+}
+function mostrarLimite(n){ $("cfg-acomp").value = String(n); $("cfg-desc").innerHTML = descreverLimite(n); $("cfg-salvar").disabled = true; }
+$("cfg-acomp").addEventListener("change", () => {
+  const n = Number($("cfg-acomp").value);
+  const acima = dados.lista.filter(c => c.vai === "sim" && Number(c.pessoas) > n + 1).length;
+  $("cfg-desc").innerHTML = descreverLimite(n) + (acima ? ` <b>${acima} ${acima === 1 ? "confirmação já tem" : "confirmações já têm"} mais pessoas</b> e ${acima === 1 ? "continua valendo" : "continuam valendo"}.` : "");
+  $("cfg-salvar").disabled = n === limite;
+});
+$("cfg-salvar").addEventListener("click", async () => {
+  const b = $("cfg-salvar"), n = Number($("cfg-acomp").value);
+  b.disabled = true; b.textContent = "Salvando…";
+  try {
+    const r = await fetch("/api/config", { method: "POST", headers: { "Content-Type": "application/json", "x-senha": senha }, body: JSON.stringify({ maxAcompanhantes: n }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.erro || "Não foi possível salvar.");
+    limite = j.maxAcompanhantes; mostrarLimite(limite); desenhar();
+    avisar(limite === 0 ? "Convites agora sem acompanhantes ✓" : `Limite salvo: até ${limite + 1} pessoas por convite ✓`);
+  } catch (e) { b.disabled = false; avisar(e.message); }
+  finally { b.textContent = "Salvar"; }
+});
+
 $("csv").addEventListener("click", () => {
-  const linhas = [["Nome","WhatsApp","Vai","Pessoas","Acompanhante 1","Acompanhante 2","Recado","Data"],
+  const n = colunasAcomp();
+  const linhas = [["Nome","WhatsApp","Vai","Pessoas", ...Array.from({ length: n }, (_, i) => `Acompanhante ${i + 1}`), "Recado","Data"],
     ...dados.lista.map(c => {
       const a = c.vai === "sim" ? acompDe(c) : [];
       return [c.nome, fone(c.telefone), c.vai === "sim" ? "Sim" : "Não", c.pessoas,
-              a[0] || "", a[1] || "", c.recado || "", new Date(c.atualizadoEm).toLocaleString("pt-BR")];
+              ...Array.from({ length: n }, (_, i) => a[i] || ""), c.recado || "", new Date(c.atualizadoEm).toLocaleString("pt-BR")];
     })];
   const csv = "﻿" + linhas.map(l => l.map(v => `"${String(v ?? "").replace(/^[=+\-@\t\r]/, "'$&").replace(/"/g, '""')}"`).join(";")).join("\r\n");
   const a = document.createElement("a");
@@ -349,22 +404,23 @@ async function gerarListaPresenca(){
   // Aba 2: todas as respostas (inclui quem não vai e os recados)
   const wr = wb.addWorksheet("Todas as respostas");
   const vao = dados.lista.filter(c => c.vai === "sim").length;
-  cabecalho(wr, [26, 17, 8, 10, 22, 22, 40, 18], "Todas as respostas",
+  const nA = colunasAcomp();
+  cabecalho(wr, [26, 17, 8, 10, ...Array(nA).fill(22), 40, 18], "Todas as respostas",
     `${dados.lista.length} respostas · ${vao} vão · ${dados.lista.length - vao} não vão`);
-  titulos(wr, ["Nome", "WhatsApp", "Vai", "Pessoas", "Acompanhante 1", "Acompanhante 2", "Recado", "Data"], 11);
+  titulos(wr, ["Nome", "WhatsApp", "Vai", "Pessoas", ...Array.from({ length: nA }, (_, i) => `Acompanhante ${i + 1}`), "Recado", "Data"], 11);
   dados.lista.forEach((c, i) => {
     const a = c.vai === "sim" ? acompDe(c) : [];
     const r = wr.getRow(12 + i);
     r.values = [c.nome, fone(c.telefone), c.vai === "sim" ? "Sim" : "Não", c.vai === "sim" ? Number(c.pessoas) || 1 : 0,
-                a[0] || "", a[1] || "", c.recado || "", horaLocal(c.atualizadoEm)];
+                ...Array.from({ length: nA }, (_, k) => a[k] || ""), c.recado || "", horaLocal(c.atualizadoEm)];
     r.eachCell({ includeEmpty: true }, (cel, k) => {
       cel.border = bordas;
       cel.fill = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 ? ROSA : "FFFFFFFF" } };
       cel.font = { name: "Georgia", size: 10.5, color: { argb: "FF4E0B17" } };
-      cel.alignment = { vertical: "top", wrapText: k === 7, horizontal: k === 3 || k === 4 ? "center" : "left" };
+      cel.alignment = { vertical: "top", wrapText: k === 5 + nA, horizontal: k === 3 || k === 4 ? "center" : "left" };
     });
     if (c.vai !== "sim") r.getCell(3).font = { name: "Georgia", size: 10.5, italic: true, color: { argb: "FF9B8A8C" } };
-    r.getCell(8).numFmt = "dd/mm/yyyy hh:mm";
+    r.getCell(6 + nA).numFmt = "dd/mm/yyyy hh:mm";
   });
   impressao(wr, 11, true);
 
@@ -387,7 +443,7 @@ const Editar = (() => {
   const modal = $("modal-editar"), form = $("form-editar"), lista = $("e-acomps"), erro = $("e-erro");
   let original = null, memoria = [];
   const vai = () => form.querySelector('[name="e-vai"]:checked')?.value;
-  const qtd = () => vai() === "sim" ? Math.max(0, Math.min(2, (parseInt($("e-pessoas").value, 10) || 1) - 1)) : 0;
+  const qtd = () => vai() === "sim" ? Math.max(0, Math.min(TETO, (parseInt($("e-pessoas").value, 10) || 1) - 1)) : 0;
   const mascara = v => { const d = v.replace(/\D/g, "").slice(0, 11);
     return d.length > 6 ? `(${d.slice(0,2)}) ${d.slice(2, d.length-4)}-${d.slice(-4)}` : d.length > 2 ? `(${d.slice(0,2)}) ${d.slice(2)}` : d; };
 
@@ -409,7 +465,10 @@ const Editar = (() => {
     original = c.telefone; memoria = [...acompDe(c)];
     $("e-nome").value = c.nome; $("e-tel").value = mascara(c.telefone); $("e-recado").value = c.recado || "";
     form.querySelector(`[name="e-vai"][value="${c.vai === "sim" ? "sim" : "nao"}"]`).checked = true;
-    $("e-pessoas").value = String(Math.min(3, Math.max(1, Number(c.pessoas) || 1)));
+    // opções até o limite atual; se o grupo já for maior (confirmou antes de mudar), mantém o tamanho dele
+    const atual = Math.max(1, Number(c.pessoas) || 1), maximo = Math.min(TETO + 1, Math.max(limite + 1, atual));
+    $("e-pessoas").innerHTML = Array.from({ length: maximo }, (_, i) => `<option>${i + 1}</option>`).join("");
+    $("e-pessoas").value = String(Math.min(maximo, atual));
     lista.innerHTML = ""; montar(); erro.textContent = "";
     modal.hidden = false; $("e-nome").focus();
   }

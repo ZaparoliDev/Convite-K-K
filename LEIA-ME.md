@@ -7,9 +7,11 @@
 - `api/lista.js`: devolve a lista para o admin (GET, cabeçalho `x-senha`)
 - `api/excluir.js`: exclui uma confirmação (POST, cabeçalho `x-senha`)
 - `api/editar.js`: os noivos corrigem uma confirmação (POST, cabeçalho `x-senha`)
+- `api/config.js`: limite de acompanhantes (GET público; POST com cabeçalho `x-senha`)
 - `lib/auth.js`: verificação da senha do admin
 - `lib/db.js`: conexão com o MongoDB
 - `lib/validar.js`: regras de validação, as mesmas para o formulário e para a edição
+- `lib/config.js`: leitura do limite de acompanhantes (coleção `config` no MongoDB)
 - `logo-kk.png`: logo usado na lista de presença
 
 ## Como publicar
@@ -26,7 +28,10 @@
 - Prazo: até 20/11/2026 23:59 (Brasília). Depois disso a API recusa novos envios e o botão fica desativado.
 - O mesmo WhatsApp confirmando de novo **atualiza** a resposta anterior, sem duplicar.
 - Anti-spam: campo invisível (robôs preenchem, pessoas não).
-- Quantidade: de 1 a 3 pessoas, contando quem confirma.
+- Quantidade: os noivos escolhem no admin quantos acompanhantes cada convite permite (de 0 a 9; padrão 2,
+  ou seja, até 3 pessoas). O formulário mostra só as opções permitidas e a API recusa acima do limite.
+  Com 0, o formulário nem pergunta quantas pessoas. Quem já confirmou antes de o limite diminuir continua valendo
+  e aparece no admin com a marca "acima do limite".
 - Acompanhantes: com 2 ou 3 pessoas, o nome de cada acompanhante é obrigatório (mín. 3 letras),
   no formulário e na API. Fica salvo no campo `acompanhantes` (lista de nomes; vazia para quem não vai).
   Os campos somem com "Não poderei ir" e voltam preenchidos se a pessoa abrir o formulário de novo.
@@ -48,6 +53,12 @@
   dá a música, porque os navegadores bloqueiam áudio sem interação.
 - O botão redondo no canto liga e desliga a música. A música pausa sozinha quando a pessoa sai da aba.
 - Sem `musica.mp3`, o botão some e o resto funciona normalmente.
+
+## Limite de acompanhantes
+- No topo do admin, em "Acompanhantes por convite", escolha o número e toque em "Salvar".
+- Vale na hora para quem abrir o convite depois disso.
+- Na edição, os noivos podem abrir exceção acima do limite (até 10 pessoas no total).
+- O CSV e o Excel criam quantas colunas "Acompanhante N" forem necessárias.
 
 ## Editar no admin
 - Cada resposta tem o botão "Editar": dá para mudar nome, WhatsApp, se vai ou não, a quantidade de pessoas,

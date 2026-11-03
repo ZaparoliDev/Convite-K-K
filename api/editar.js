@@ -1,6 +1,7 @@
 const { getDb } = require("../lib/db");
 const { exigirSenha } = require("../lib/auth");
 const { validarConfirmacao } = require("../lib/validar");
+const { MAX_ACOMPANHANTES } = require("../lib/config");
 
 // Os noivos corrigem uma confirmação (vale também depois do prazo).
 // Corpo: { telefoneOriginal, nome, telefone, vai, pessoas, acompanhantes, recado }
@@ -18,7 +19,8 @@ module.exports = async (req, res) => {
   const original = String(corpo.telefoneOriginal || "").replace(/\D/g, "");
   if (!original) return res.status(400).json({ erro: "Confirmação não informada." });
 
-  const { erro, dados } = validarConfirmacao(corpo);
+  // Os noivos podem abrir exceção acima do limite do formulário (até o teto de segurança)
+  const { erro, dados } = validarConfirmacao(corpo, MAX_ACOMPANHANTES + 1);
   if (erro) return res.status(400).json({ erro });
 
   try {

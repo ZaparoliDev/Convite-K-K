@@ -1,5 +1,6 @@
 const { getDb } = require("../lib/db");
 const { validarConfirmacao } = require("../lib/validar");
+const { lerConfig } = require("../lib/config");
 
 // Prazo: até o fim do dia 20/11/2026 (horário de Brasília)
 const PRAZO = new Date("2026-11-20T23:59:59-03:00");
@@ -20,11 +21,13 @@ module.exports = async (req, res) => {
   // Campo invisível: robôs preenchem, pessoas não
   if (corpo.site) return res.status(200).json({ ok: true });
 
-  const { erro, dados } = validarConfirmacao(corpo);
-  if (erro) return res.status(400).json({ erro });
-
   try {
     const db = await getDb();
+    // Quantas pessoas cada convite permite é decidido pelos noivos no admin
+    const { maxAcompanhantes } = await lerConfig(db);
+    const { erro, dados } = validarConfirmacao(corpo, maxAcompanhantes + 1);
+    if (erro) return res.status(400).json({ erro });
+
     const col = db.collection("confirmacoes");
     await col.createIndex({ telefone: 1 }, { unique: true });
 
