@@ -238,7 +238,7 @@ function desenharItens() {
   $("lista-itens").innerHTML = dados.itens.length ? dados.itens.map(i => {
     const cheio = i.reservas.length >= i.quantidade;
     return `<li class="reg" data-id="${esc(i.id)}">
-      ${miniatura(i, false, i.categoria)}
+      ${miniatura(i, false, KK.iconeDoItem(i))}
       <h3>${esc(i.nome)} <span class="etiqueta ${cheio ? "cheio" : "livre"}">${cheio ? (i.quantidade > 1 ? "todos escolhidos" : "escolhido") : `${i.quantidade - i.reservas.length} ${i.quantidade - i.reservas.length > 1 ? "livres" : "livre"}${i.quantidade > 1 ? " de " + i.quantidade : ""}`}</span></h3>
       <span class="acoes"><button class="btn claro mini" data-acao="editar-item">Editar</button><button class="btn claro mini" data-acao="excluir-item">Excluir</button></span>
       <span class="info">${esc(categoria(i.categoria).rotulo)}${i.preco != null ? " · ≈ " + reais(i.preco) : ""}${i.link ? ` · <a href="${esc(i.link)}" target="_blank" rel="noopener">link ↗</a>` : ""}</span>
@@ -378,8 +378,9 @@ function editarItem(item) {
       <p class="erro" style="margin:0"></p>
       <div class="modal-botoes"><button class="btn claro" type="button" data-fechar>Cancelar</button><button class="btn" type="submit">Salvar</button></div>
     </form>`);
-  const foto = campoFoto(m, item?.imagem || "", false, () => m.querySelector("#e-cat").value);
+  const foto = campoFoto(m, item?.imagem || "", false, () => KK.iconeDoItem({ nome: m.querySelector("#e-nome").value, categoria: m.querySelector("#e-cat").value }));
   m.querySelector("#e-cat").onchange = foto.repintar;
+  m.querySelector("#e-nome").addEventListener("input", foto.repintar);
   m.querySelector("#e-nome").focus();
   m.querySelector("form").addEventListener("submit", async e => {
     e.preventDefault();

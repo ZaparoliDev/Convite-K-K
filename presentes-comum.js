@@ -25,6 +25,34 @@
     coracao: '<path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20Z"/>',
     camera: '<path d="M4 8h3l2-2.5h6L17 8h3v11H4V8Z"/><circle cx="12" cy="13.2" r="3.5"/>',
   };
+  // Desenhos de presentes específicos (escolhidos pelo nome do item)
+  Object.assign(ICONES, {
+    talheres: '<path d="M8 3v7.5M5.8 3v4.3a2.2 2.2 0 0 0 4.4 0V3M8 10.5V21"/><path d="M17 21V3c-1.9 1.3-3 3.8-3 6.9V13.5h3"/>',
+    airfryer: '<path d="M6.5 3.5h11a2.5 2.5 0 0 1 2.5 2.5v12.5a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5V6a2.5 2.5 0 0 1 2.5-2.5Z"/><path d="M4 11h16M9 15.5h6"/><circle cx="12" cy="7.3" r="1.4"/>',
+    mixer: '<path d="M10 2.5h4v9.5h-4z"/><path d="M11 12h2v4.5h-2z"/><path d="M8.3 16.5h7.4l-1 4h-5.4Z"/><path d="M12 5v2.5"/>',
+    ferro: '<path d="M2.5 17.5h18V15c0-3.3-2.7-6-6-6H10C5.9 9 2.5 12.6 2.5 17.5Z"/><path d="M9.5 9V6.5h7.5"/><path d="M6.5 14h3"/>',
+    mesa: '<path d="M5 10h14M7 10v9.5M17 10v9.5"/><path d="M2.5 6.5v13M2.5 14.5H5M21.5 6.5v13M21.5 14.5H19"/>',
+    liquidificador: '<path d="M7 3h10l-1.5 11h-7L7 3Z"/><path d="M8 14h8l1 7H7l1-7ZM11 17.5h2"/>',
+    cafeteira: '<path d="M6 3h11v4H6zM7 7l1 3h7l1-3"/><path d="M7.5 21h9l-.8-7.5H8.3Z"/><path d="M16 14.5h2a2 2 0 0 1 0 4h-1.5"/>',
+    toalha: '<path d="M6 3h12v14H6zM6 17v4h12v-4M9 7h6"/>',
+    quadro: '<rect x="3.5" y="5" width="17" height="14" rx="1"/><path d="m3.5 16 5-5 4 4 3-3 5 5"/><circle cx="15.5" cy="9" r="1.3"/>',
+    aspirador: '<path d="M9 2.5v13.5M9 2.5h4"/><path d="M9 16h5a3 3 0 0 1 3 3v1.5H6V19a3 3 0 0 1 3-3Z"/>',
+    geladeira: '<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M6 9.5h12M9 5.5v2M9 12.5v3"/>',
+    microondas: '<rect x="2.5" y="5" width="19" height="14" rx="2"/><rect x="5" y="8" width="10" height="8" rx="1"/><path d="M18 9h.01M18 12h.01M18 15h.01"/>',
+  });
+  const DESENHOS_POR_NOME = [
+    [/talher|faqueiro|prato|louca|aparelho de jantar/, "talheres"], [/air ?fry|fritadeira/, "airfryer"], [/mixer/, "mixer"],
+    [/ferro/, "ferro"], [/mesa/, "mesa"], [/liquidific/, "liquidificador"], [/cafe/, "cafeteira"], [/toalha/, "toalha"],
+    [/cama|lencol|edredom|travesseiro|colcha/, "quarto"], [/taca|copo/, "mesa_taca"], [/quadro/, "quadro"], [/aspirador/, "aspirador"],
+    [/geladeira/, "geladeira"], [/micro.?ondas/, "microondas"], [/panela|frigideira|caneca|forma/, "cozinha"], [/sofa/, "sofa"],
+  ];
+  ICONES.mesa_taca = ICONES.mesa_taca || '<path d="M7.5 3h9l-.6 5.2a3.9 3.9 0 0 1-7.8 0L7.5 3Z"/><path d="M12 12v8M8.5 20.5h7M8 6.5h8"/>';
+  const iconeDoItem = item => {
+    const n = String(item.nome || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    const achou = DESENHOS_POR_NOME.find(([re]) => re.test(n));
+    return achou ? achou[1] : item.categoria;
+  };
+
   const ROTULOS_ICONES = {
     aviao: "Viagem", jantar: "Jantar", hotel: "Hospedagem", passeio: "Passeio",
     sofa: "Casa", presente: "Presente", coracao: "Carinho", camera: "Fotos",
@@ -51,5 +79,5 @@
     return Number.isFinite(n) ? Math.round(n * 100) / 100 : NaN;
   }
 
-  raiz.KK = { CATEGORIAS, ICONES, ROTULOS_ICONES, icone, categoria, reais, esc, lerValor };
+  raiz.KK = { CATEGORIAS, ICONES, ROTULOS_ICONES, icone, iconeDoItem, categoria, reais, esc, lerValor };
 })(window);
