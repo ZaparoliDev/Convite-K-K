@@ -13,6 +13,12 @@
 - `lib/validar.js`: regras de validação, as mesmas para o formulário e para a edição
 - `lib/config.js`: leitura do limite de acompanhantes (coleção `config` no MongoDB)
 - `logo-kk.png`: logo usado na lista de presença
+- `presentes.html`: lista de presentes para os convidados (itens para a casa + cotas com Pix)
+- `admin-presentes.html`: painel dos presentes (mesma senha do admin)
+- `api/presentes.js`, `api/reservar.js`, `api/contribuir.js`, `api/gerenciar-presentes.js`, `api/imagem.js`: API da lista
+- `lib/presentes.js`: regras da lista (validação, lista inicial, fotos, limites anti-abuso)
+- `pix.js`: gera o Pix copia e cola (padrão do Banco Central) · `presentes-comum.js`: ícones e categorias
+- `folhas-canto.webp`, `folhas-base.webp`: folhagens recortadas do convite, usadas na lista
 
 ## Como publicar
 1. MongoDB Atlas: crie um cluster grátis (M0), um usuário e libere o acesso de rede `0.0.0.0/0`.
@@ -69,3 +75,31 @@
 
 ## Excluir no admin
 - Cada resposta tem o botão "Excluir". O 1º toque pede confirmação, e o 2º (em até 4 s) exclui de vez.
+
+## Lista de presentes
+- Endereço: `/presentes.html` (o convite tem o botão "Lista de presentes" e o link aparece após confirmar presença).
+- **Itens para a casa**: o convidado escolhe, informa o nome (e um recado, se quiser) e reserva. Cada item pode ter
+  quantidade (ex.: 2 jogos de cama); a reserva é atômica, então duas pessoas não pegam a última unidade.
+  Ele pode desistir depois em "Minhas escolhas" (só do aparelho em que reservou).
+- **Cotas com Pix** (lua de mel etc.): o convidado escolhe quantas cotas ou outro valor, e a página gera na hora o
+  QR code e o Pix copia e cola com o valor certo e um código (ex.: `KK4NAW3VJM`). Ao tocar em "Já fiz o Pix",
+  a contribuição fica registrada como "a conferir".
+- **Primeiro acesso**: a lista começa com os itens dos noivos (panelas, pratos e talheres, air fryer, mixer,
+  ferro de passar roupa, mesa com 4 cadeiras) e 5 cotas de exemplo. Edite ou exclua tudo no painel.
+
+### Painel dos presentes (`/admin-presentes.html`)
+- Aba **Presentes**: adicionar/editar (nome, categoria, quantidade, preço aproximado, link, detalhes e foto),
+  ver quem reservou e o recado, liberar uma reserva, excluir.
+- Aba **Cotas e Pix recebidos**: criar/editar cotas (valor, meta, ícone ou foto) e conferir cada Pix pelo código
+  no extrato do banco (botão "Conferido").
+- Aba **Pix e WhatsApp**: chave Pix (tipo, chave, nome e cidade como aparecem no banco), WhatsApp dos noivos
+  (botão "Avisar os noivos"), recado sobre a entrega e se mostra quanto cada cota já arrecadou.
+  **Use "Testar Pix" e leia o QR no app do banco** para conferir o nome antes de divulgar.
+- **Lista de agradecimentos**: Excel com o logo, quem deu o quê, recados e coluna para marcar o agradecimento.
+- As fotos são reduzidas no celular (até 900 px) e guardadas no MongoDB (coleção `imagens`).
+
+### Coleções novas no MongoDB (criadas sozinhas)
+`presentes`, `reservas`, `cotas`, `contribuicoes`, `imagens` e o documento `presentes` dentro de `config`.
+
+### Limite do Vercel
+O plano Hobby aceita até 12 funções em `api/`. O projeto agora usa 10.

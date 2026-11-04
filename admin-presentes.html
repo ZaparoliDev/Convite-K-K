@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Presentes — Kauan & Karol</title>
+<link rel="icon" href="logo-kk.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;padding:20px 14px 60px;color:#7A1325;font-family:"Cormorant Garamond",Georgia,serif;
+ background:radial-gradient(circle at 15% 10%,rgba(201,112,122,.16),transparent 35%),#EFE6DB}
+[hidden]{display:none!important}
+button{cursor:pointer;font-family:inherit}
+.caixa{width:min(100%,920px);margin:0 auto;padding:26px clamp(14px,4vw,32px);background:linear-gradient(180deg,#FBF7F1,#F4ECE2);
+ border-radius:22px;box-shadow:0 20px 50px rgba(78,11,23,.15),inset 0 0 0 6px rgba(255,255,255,.55),inset 0 0 0 7px rgba(122,19,37,.1)}
+h1{text-align:center;font:400 2.8rem/1 "Allura",cursive}
+.sub{text-align:center;margin:4px 0 16px;font-style:italic;opacity:.8}
+.nav-admin{display:flex;justify-content:center;gap:6px;margin:0 0 20px}
+.nav-admin a{padding:8px 16px;font:600 1rem/1 "Cormorant Garamond",serif;color:#7A1325;text-decoration:none;border:1px solid rgba(122,19,37,.25);border-radius:999px}
+.nav-admin a[aria-current="page"]{color:#FBF4EC;background:#7A1325;border-color:#7A1325}
+#login{display:flex;gap:8px;max-width:360px;margin:0 auto}
+input,select,textarea{padding:10px 12px;font:500 1.05rem "Cormorant Garamond",serif;color:#4E0B17;background:#fff;border:1px solid rgba(122,19,37,.25);border-radius:12px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#7A1325;box-shadow:0 0 0 3px rgba(122,19,37,.1)}
+#login input{flex:1}
+.btn{padding:10px 18px;font:600 1rem "Cormorant Garamond",serif;color:#FBF4EC;background:#7A1325;border:0;border-radius:999px}
+.btn.claro{color:#7A1325;background:none;border:1px solid rgba(122,19,37,.35)}
+.btn.mini{padding:6px 13px;font-size:.9rem}
+.btn:disabled{opacity:.55;cursor:wait}
+.btn.certeza{color:#FBF4EC;background:#A3172F;border-color:#A3172F}
+.erro{min-height:1.3em;margin-top:10px;text-align:center;color:#A3172F}
+
+.totais{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.total{padding:13px 8px;text-align:center;background:rgba(255,255,255,.6);border:1px solid rgba(122,19,37,.15);border-radius:14px}
+.total b{display:block;font:500 1.9rem/1.05 "Cormorant Garamond",serif}
+.total span{font:600 .7rem/1.2 "Cormorant Garamond",serif;letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+@media (max-width:520px){.totais{grid-template-columns:1fr 1fr}.totais .total:last-child{grid-column:1/-1}}
+
+.abas{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid rgba(122,19,37,.15);overflow-x:auto}
+.aba{padding:10px 14px;font:600 1.05rem/1 "Cormorant Garamond",serif;color:#7A1325;background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.aba[aria-selected="true"]{border-bottom-color:#7A1325}
+.barra{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.barra .esp{flex:1}
+
+ul.lista{list-style:none;display:grid;gap:10px}
+.reg{display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:start;padding:12px 14px;background:rgba(255,255,255,.65);border:1px solid rgba(122,19,37,.12);border-radius:16px}
+.miniatura{grid-row:span 2;display:grid;place-items:center;width:54px;height:66px;overflow:hidden;border-radius:60px 60px 8px 8px;background:#F2E7DD}
+.miniatura.redonda{width:56px;height:56px;border-radius:50%;color:#F6DCD2;background:radial-gradient(circle at 35% 30%,#B23848,#7A1325 58%,#560D1A)}
+.miniatura img{width:100%;height:100%;object-fit:cover}
+.miniatura svg{width:26px;height:26px}
+.reg h3{font:600 1.15rem/1.15 "Cormorant Garamond",serif;color:#4E0B17}
+.reg .info{font-size:.98rem;opacity:.85}
+.reg .info a{color:inherit;font-weight:600}
+.reg .acoes{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.etiqueta{display:inline-block;padding:3px 9px;margin-left:4px;font:700 .72rem/1 "Cormorant Garamond",serif;letter-spacing:.06em;border-radius:999px;vertical-align:2px}
+.etiqueta.cheio{color:#FBF4EC;background:#7A1325}
+.etiqueta.livre{border:1px solid rgba(122,19,37,.35)}
+.etiqueta.recebido{color:#FBF4EC;background:#2E7D4F}
+.etiqueta.informado{color:#7A1325;background:rgba(201,112,122,.22)}
+.subreg{grid-column:2/-1;display:grid;gap:6px;margin-top:6px;list-style:none}
+.subreg li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:8px 11px;background:rgba(122,19,37,.04);border-left:3px solid rgba(122,19,37,.4);border-radius:8px}
+.subreg b{font-weight:700}
+.subreg .recado{grid-column:1;font-style:italic;opacity:.85}
+.subreg .acoes{grid-row:span 2}
+@media (max-width:560px){.reg{grid-template-columns:auto 1fr}.reg>.acoes{grid-column:1/-1;justify-content:flex-start}.subreg{grid-column:1/-1}}
+.vazio{padding:20px;text-align:center;font-style:italic;opacity:.75}
+
+/* formulários */
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:14px;background:rgba(46,8,16,.55);backdrop-filter:blur(5px)}
+.modal-caixa{position:relative;width:min(100%,480px);max-height:calc(100svh - 28px);overflow:auto;padding:24px 22px 20px;
+ background:linear-gradient(180deg,#FBF7F1,#F4ECE2);border-radius:22px;box-shadow:0 30px 70px rgba(30,4,10,.45),inset 0 0 0 6px rgba(255,255,255,.55),inset 0 0 0 7px rgba(122,19,37,.12)}
+.modal-caixa h2{text-align:center;font:400 2.2rem/1 "Allura",cursive;margin-bottom:14px}
+.fechar{position:absolute;top:10px;right:12px;width:34px;height:34px;font-size:1.6rem;line-height:1;color:#7A1325;background:none;border:0;opacity:.6}
+.form{display:grid;gap:12px}
+.form label,.form legend{display:block;margin-bottom:5px;font:600 .72rem/1 "Cormorant Garamond",serif;letter-spacing:.16em;text-transform:uppercase;opacity:.85}
+.form label small{letter-spacing:0;text-transform:none;font-weight:500}
+.form input,.form select,.form textarea{width:100%}
+.form textarea{height:66px;resize:none}
+.form fieldset{border:0}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.foto{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+.foto .miniatura{grid-row:auto;width:72px;height:88px}
+.foto .miniatura.redonda{width:72px;height:72px}
+.foto-botoes{display:flex;flex-wrap:wrap;gap:6px}
+.icones{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.icones label{margin:0;cursor:pointer}
+.icones input{position:absolute;opacity:0;pointer-events:none}
+.icones span{display:grid;justify-items:center;gap:4px;padding:8px 4px;font:600 .8rem/1 "Cormorant Garamond",serif;letter-spacing:0;text-transform:none;border:1px solid rgba(122,19,37,.2);border-radius:12px;background:#fff}
+.icones svg{width:24px;height:24px}
+.icones input:checked+span{color:#FBF4EC;background:#7A1325;border-color:#7A1325}
+.icones input:focus-visible+span{box-shadow:0 0 0 3px rgba(122,19,37,.25)}
+.modal-botoes{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.check{display:flex!important;align-items:center;gap:8px;letter-spacing:0!important;text-transform:none!important;font:600 1rem "Cormorant Garamond",serif!important;opacity:1!important;cursor:pointer}
+.check input{width:auto;accent-color:#7A1325}
+.dica{font-size:.95rem;font-style:italic;opacity:.8}
+.qr-teste{display:grid;justify-items:center;gap:8px;padding:14px;margin-top:6px;background:#fff;border-radius:16px;border:1px dashed rgba(122,19,37,.3)}
+.qr-teste #qr{width:180px;height:180px}
+.qr-teste #qr svg{width:100%;height:100%}
+.qr-teste textarea{width:100%;height:58px;font:500 .75rem/1.3 ui-monospace,Menlo,monospace;resize:none}
+.aviso{position:fixed;left:50%;bottom:22px;z-index:80;translate:-50% 0;padding:11px 20px;max-width:calc(100% - 28px);border-radius:999px;color:#FBF4EC;background:#7A1325;
+ font:600 .95rem "Cormorant Garamond",serif;box-shadow:0 10px 24px rgba(78,11,23,.3);opacity:0;transition:opacity .3s;pointer-events:none;text-align:center}
+.aviso.ver{opacity:1}
+</style>
+</head>
+<body>
+<main class="caixa">
+  <h1>Kauan &amp; Karol</h1>
+  <p class="sub">Lista de presentes</p>
+  <nav class="nav-admin" aria-label="Painel">
+    <a href="admin.html">Confirmações</a>
+    <a href="admin-presentes.html" aria-current="page">Presentes</a>
+  </nav>
+
+  <form id="login">
+    <input id="senha" type="password" placeholder="Senha" autocomplete="current-password" required>
+    <button class="btn">Entrar</button>
+  </form>
+  <p class="erro" id="erro"></p>
+
+  <section id="painel" hidden>
+    <div class="totais">
+      <div class="total"><b id="t-itens">0</b><span>Presentes escolhidos</span></div>
+      <div class="total"><b id="t-informado">R$ 0</b><span>Pix informados</span></div>
+      <div class="total"><b id="t-recebido">R$ 0</b><span>Pix conferidos</span></div>
+    </div>
+
+    <div class="abas" role="tablist">
+      <button class="aba" role="tab" data-aba="itens" aria-selected="true">Presentes</button>
+      <button class="aba" role="tab" data-aba="cotas" aria-selected="false">Cotas e Pix recebidos</button>
+      <button class="aba" role="tab" data-aba="config" aria-selected="false">Pix e WhatsApp</button>
+    </div>
+
+    <div class="barra" id="barra">
+      <button class="btn" type="button" id="novo">+ Novo presente</button>
+      <span class="esp"></span>
+      <button class="btn claro" type="button" id="agradecimentos">Lista de agradecimentos</button>
+      <a class="btn claro" href="presentes.html" target="_blank" rel="noopener" style="text-decoration:none">Ver a página ↗</a>
+      <button class="btn claro" type="button" id="atualizar">Atualizar</button>
+    </div>
+
+    <ul class="lista" id="lista-itens"></ul>
+    <ul class="lista" id="lista-cotas" hidden></ul>
+
+    <form class="form" id="form-config" hidden novalidate>
+      <p class="dica">A chave Pix aparece para os convidados no código copia e cola das cotas. Confira com o botão “Testar Pix”.</p>
+      <div class="dupla">
+        <div><label for="c-tipo">Tipo da chave</label>
+          <select id="c-tipo"><option value="">—</option><option value="cpf">CPF</option><option value="cnpj">CNPJ</option><option value="telefone">Celular</option><option value="email">E-mail</option><option value="aleatoria">Chave aleatória</option></select></div>
+        <div><label for="c-chave">Chave Pix</label><input id="c-chave" autocomplete="off"></div>
+      </div>
+      <div class="dupla">
+        <div><label for="c-nome">Nome de quem recebe</label><input id="c-nome" maxlength="60" placeholder="Como aparece no banco"></div>
+        <div><label for="c-cidade">Cidade</label><input id="c-cidade" maxlength="40" placeholder="São Paulo"></div>
+      </div>
+      <div><label for="c-zap">WhatsApp dos noivos <small>(opcional: botão “Avisar os noivos”)</small></label><input id="c-zap" type="tel" inputmode="numeric" placeholder="(11) 90000-0000" maxlength="16"></div>
+      <div><label for="c-entrega">Recado sobre a entrega dos presentes</label><textarea id="c-entrega" maxlength="240"></textarea></div>
+      <label class="check"><input type="checkbox" id="c-mostrar"> Mostrar aos convidados quanto cada cota já arrecadou</label>
+      <p class="erro" id="c-erro" style="margin:0"></p>
+      <div class="modal-botoes">
+        <button class="btn claro" type="button" id="testar-pix">Testar Pix</button>
+        <button class="btn" type="submit" id="c-salvar">Salvar</button>
+      </div>
+      <div class="qr-teste" id="qr-teste" hidden>
+        <div id="qr"></div>
+        <p class="dica" style="text-align:center">Pix de teste de R$ 1,00. Leia no app do banco e confira o nome de quem recebe. <b>Não precisa pagar.</b></p>
+        <textarea readonly id="qr-codigo" aria-label="Código de teste"></textarea>
+      </div>
+    </form>
+  </section>
+</main>
+<div class="aviso" id="aviso" role="status"></div>
+
+<script src="presentes-comum.js"></script>
+<script src="pix.js"></script>
+<script>
+const { CATEGORIAS, ICONES, ROTULOS_ICONES, icone, categoria, reais, esc, lerValor } = KK;
+const $ = id => document.getElementById(id);
+const CDN_EXCELJS = "https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js";
+const QR_LIB = "https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js";
+let senha = "", dados = null, aba = "itens";
+try { senha = sessionStorage.getItem("kk-senha") || ""; } catch {}
+
+const dataHora = d => new Date(d).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+function avisar(t) { const a = $("aviso"); a.textContent = t; a.classList.add("ver"); clearTimeout(avisar.t); avisar.t = setTimeout(() => a.classList.remove("ver"), 2800); }
+
+async function api(metodo, corpo) {
+  const r = await fetch("/api/gerenciar-presentes", { method: metodo, headers: { "Content-Type": "application/json", "x-senha": senha }, body: corpo ? JSON.stringify(corpo) : undefined, cache: "no-store" });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(j.erro || "Erro ao falar com o servidor."); e.status = r.status; throw e; }
+  return j;
+}
+
+async function carregar() {
+  $("erro").textContent = "";
+  try {
+    dados = await api("GET");
+    try { sessionStorage.setItem("kk-senha", senha); } catch {}
+    $("login").hidden = true; $("painel").hidden = false;
+    desenhar();
+  } catch (e) {
+    $("erro").textContent = e.message;
+    if (e.status === 401) { $("login").hidden = false; $("painel").hidden = true; }
+  }
+}
+$("login").addEventListener("submit", e => { e.preventDefault(); senha = $("senha").value; carregar(); });
+$("atualizar").onclick = carregar;
+
+/* ===== Abas ===== */
+document.querySelectorAll(".aba").forEach(b => b.onclick = () => {
+  aba = b.dataset.aba;
+  document.querySelectorAll(".aba").forEach(x => x.setAttribute("aria-selected", x === b));
+  desenhar();
+});
+
+function desenhar() {
+  const total = dados.itens.reduce((s, i) => s + i.quantidade, 0);
+  const escolhidos = dados.itens.reduce((s, i) => s + i.reservas.length, 0);
+  const contribs = dados.cotas.flatMap(c => c.contribuicoes);
+  $("t-itens").textContent = `${escolhidos} de ${total}`;
+  $("t-informado").textContent = reais(contribs.reduce((s, c) => s + c.valor, 0));
+  $("t-recebido").textContent = reais(contribs.filter(c => c.status === "recebido").reduce((s, c) => s + c.valor, 0));
+
+  $("lista-itens").hidden = aba !== "itens"; $("lista-cotas").hidden = aba !== "cotas"; $("form-config").hidden = aba !== "config";
+  $("novo").hidden = aba === "config"; $("novo").textContent = aba === "cotas" ? "+ Nova cota" : "+ Novo presente";
+  if (aba === "itens") desenharItens();
+  if (aba === "cotas") desenharCotas();
+  if (aba === "config") preencherConfig();
+}
+
+function miniatura(x, redonda, nomeIcone) {
+  return `<span class="miniatura${redonda ? " redonda" : ""}" ${redonda ? "" : `style="background:${categoria(x.categoria).cor}"`}>${x.imagem ? `<img src="${esc(x.imagem)}" alt="">` : icone(nomeIcone)}</span>`;
+}
+
+function desenharItens() {
+  $("lista-itens").innerHTML = dados.itens.length ? dados.itens.map(i => {
+    const cheio = i.reservas.length >= i.quantidade;
+    return `<li class="reg" data-id="${esc(i.id)}">
+      ${miniatura(i, false, i.categoria)}
+      <h3>${esc(i.nome)} <span class="etiqueta ${cheio ? "cheio" : "livre"}">${cheio ? (i.quantidade > 1 ? "todos escolhidos" : "escolhido") : `${i.quantidade - i.reservas.length} ${i.quantidade - i.reservas.length > 1 ? "livres" : "livre"}${i.quantidade > 1 ? " de " + i.quantidade : ""}`}</span></h3>
+      <span class="acoes"><button class="btn claro mini" data-acao="editar-item">Editar</button><button class="btn claro mini" data-acao="excluir-item">Excluir</button></span>
+      <span class="info">${esc(categoria(i.categoria).rotulo)}${i.preco != null ? " · ≈ " + reais(i.preco) : ""}${i.link ? ` · <a href="${esc(i.link)}" target="_blank" rel="noopener">link ↗</a>` : ""}</span>
+      ${i.reservas.length ? `<ul class="subreg">${i.reservas.map(r => `
+        <li data-reserva="${esc(r.id)}"><span><b>${esc(r.nome)}</b> · ${dataHora(r.criadoEm)}</span>
+          <span class="acoes"><button class="btn claro mini" data-acao="liberar">Liberar</button></span>
+          ${r.recado ? `<span class="recado">“${esc(r.recado)}”</span>` : ""}</li>`).join("")}</ul>` : ""}
+    </li>`;
+  }).join("") : '<p class="vazio">Nenhum presente ainda. Toque em “+ Novo presente”.</p>';
+}
+
+function desenharCotas() {
+  $("lista-cotas").innerHTML = dados.cotas.length ? dados.cotas.map(c => {
+    const recebido = c.contribuicoes.filter(x => x.status === "recebido").reduce((s, x) => s + x.valor, 0);
+    return `<li class="reg" data-id="${esc(c.id)}">
+      ${miniatura(c, true, c.icone)}
+      <h3>${esc(c.nome)}</h3>
+      <span class="acoes"><button class="btn claro mini" data-acao="editar-cota">Editar</button><button class="btn claro mini" data-acao="excluir-cota">Excluir</button></span>
+      <span class="info">${reais(c.valor)} por cota${c.meta != null ? " · meta " + reais(c.meta) : ""} · <b>${reais(c.arrecadado)}</b> informados${recebido ? ` (${reais(recebido)} conferidos)` : ""}</span>
+      ${c.contribuicoes.length ? `<ul class="subreg">${c.contribuicoes.map(x => `
+        <li data-contrib="${esc(x.id)}"><span><b>${esc(x.nome)}</b> · ${reais(x.valor)} · código <b>${esc(x.codigo)}</b> · ${dataHora(x.criadoEm)}
+            <span class="etiqueta ${x.status}">${x.status === "recebido" ? "conferido ✓" : "a conferir"}</span></span>
+          <span class="acoes"><button class="btn claro mini" data-acao="conferir">${x.status === "recebido" ? "Desmarcar" : "Conferido"}</button><button class="btn claro mini" data-acao="excluir-contrib">Excluir</button></span>
+          ${x.recado ? `<span class="recado">“${esc(x.recado)}”</span>` : ""}</li>`).join("")}</ul>` : ""}
+    </li>`;
+  }).join("") : '<p class="vazio">Nenhuma cota ainda. Toque em “+ Nova cota”.</p>';
+}
+
+/* ===== Ações nas listas (excluir/liberar pedem um 2º toque) ===== */
+function pedirCerteza(b, texto) {
+  if (b.classList.contains("certeza")) { clearTimeout(b._t); return true; }
+  document.querySelectorAll(".certeza").forEach(x => { x.classList.remove("certeza"); x.textContent = x._orig; });
+  b._orig = b.textContent; b.classList.add("certeza"); b.textContent = texto;
+  clearTimeout(b._t); b._t = setTimeout(() => { b.classList.remove("certeza"); b.textContent = b._orig; }, 4000);
+  return false;
+}
+async function executar(b, corpo, msg) {
+  b.disabled = true;
+  try { await api("POST", corpo); await carregar(); avisar(msg); }
+  catch (e) { b.disabled = false; b.classList.remove("certeza"); if (b._orig) b.textContent = b._orig; avisar(e.message); }
+}
+document.querySelector("#painel").addEventListener("click", e => {
+  const b = e.target.closest("[data-acao]"); if (!b) return;
+  const reg = b.closest(".reg"), id = reg?.dataset.id;
+  const item = dados.itens.find(x => x.id === id), cota = dados.cotas.find(x => x.id === id);
+  switch (b.dataset.acao) {
+    case "editar-item": return editarItem(item);
+    case "editar-cota": return editarCota(cota);
+    case "excluir-item":
+      if (pedirCerteza(b, item.reservas.length ? "Excluir com as reservas?" : "Toque de novo")) executar(b, { acao: "excluirItem", id }, `“${item.nome}” saiu da lista`);
+      return;
+    case "excluir-cota":
+      if (pedirCerteza(b, cota.contribuicoes.length ? "Excluir com os Pix?" : "Toque de novo")) executar(b, { acao: "excluirCota", id }, `“${cota.nome}” saiu da lista`);
+      return;
+    case "liberar": {
+      const rid = b.closest("[data-reserva]").dataset.reserva;
+      if (pedirCerteza(b, "Toque de novo")) executar(b, { acao: "liberarReserva", id: rid }, "Reserva liberada: o presente voltou para a lista");
+      return;
+    }
+    case "conferir": {
+      const li = b.closest("[data-contrib]"), x = cota.contribuicoes.find(c => c.id === li.dataset.contrib);
+      return executar(b, { acao: "marcarContribuicao", id: x.id, status: x.status === "recebido" ? "informado" : "recebido" }, x.status === "recebido" ? "Marcado como a conferir" : "Pix conferido ✓");
+    }
+    case "excluir-contrib": {
+      const li = b.closest("[data-contrib]");
+      if (pedirCerteza(b, "Toque de novo")) executar(b, { acao: "excluirContribuicao", id: li.dataset.contrib }, "Contribuição excluída");
+      return;
+    }
+  }
+});
+$("novo").onclick = () => aba === "cotas" ? editarCota(null) : editarItem(null);
+
+/* ===== Janela de edição ===== */
+function abrirModal(html) {
+  const m = document.createElement("div");
+  m.className = "modal";
+  m.innerHTML = `<div class="modal-caixa" role="dialog" aria-modal="true"><button class="fechar" type="button" aria-label="Fechar" data-fechar>&times;</button>${html}</div>`;
+  const fechar = () => { m.remove(); removeEventListener("keydown", esc_); };
+  const esc_ = e => { if (e.key === "Escape") fechar(); };
+  m.addEventListener("click", e => { if (e.target === m || e.target.closest("[data-fechar]")) fechar(); });
+  addEventListener("keydown", esc_);
+  document.body.appendChild(m);
+  return { m, fechar };
+}
+
+// Foto: reduz no próprio aparelho (máx. 900 px) antes de enviar
+function reduzirFoto(arquivo) {
+  return new Promise((ok, falha) => {
+    if (!/^image\//.test(arquivo.type)) return falha(new Error("Escolha um arquivo de imagem."));
+    const img = new Image(), url = URL.createObjectURL(arquivo);
+    img.onload = () => {
+      const MAX = 900, k = Math.min(1, MAX / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      let d = c.toDataURL("image/webp", .82);
+      if (!d.startsWith("data:image/webp")) d = c.toDataURL("image/jpeg", .85);
+      ok(d);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); falha(new Error("Não foi possível abrir essa imagem.")); };
+    img.src = url;
+  });
+}
+function campoFoto(raiz, atual, redonda, iconeAtual) {
+  let valor; // undefined = manter
+  const prev = raiz.querySelector(".foto .miniatura");
+  const pintar = src => { prev.innerHTML = src ? `<img src="${esc(src)}" alt="">` : icone(iconeAtual()); raiz.querySelector("#remover-foto").hidden = !src; };
+  pintar(atual);
+  raiz.querySelector("#arquivo").addEventListener("change", async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try { valor = await reduzirFoto(f); pintar(valor); } catch (err) { avisar(err.message); }
+    e.target.value = "";
+  });
+  raiz.querySelector("#remover-foto").onclick = () => { valor = ""; pintar(""); };
+  return { valor: () => valor, repintar: () => { if (!(valor || (valor === undefined && atual))) pintar(""); } };
+}
+const htmlFoto = redonda => `<div><label>Foto <small>(opcional)</small></label><div class="foto"><span class="miniatura${redonda ? " redonda" : ""}"></span>
+  <div class="foto-botoes"><label class="btn claro mini" style="margin:0;letter-spacing:0;text-transform:none;font-size:.9rem;opacity:1">Escolher foto<input type="file" id="arquivo" accept="image/*" hidden></label>
+  <button class="btn claro mini" type="button" id="remover-foto">Remover foto</button></div></div></div>`;
+
+function editarItem(item) {
+  const { m, fechar } = abrirModal(`
+    <h2>${item ? "Editar presente" : "Novo presente"}</h2>
+    <form class="form" novalidate>
+      <div><label for="e-nome">Nome</label><input id="e-nome" maxlength="80" value="${esc(item?.nome || "")}" placeholder="Ex.: Jogo de panelas"></div>
+      <div class="dupla">
+        <div><label for="e-cat">Categoria</label><select id="e-cat">${CATEGORIAS.map(c => `<option value="${c.id}" ${item?.categoria === c.id ? "selected" : ""}>${esc(c.rotulo)}</option>`).join("")}</select></div>
+        <div><label for="e-qtd">Quantidade</label><select id="e-qtd">${Array.from({ length: 20 }, (_, n) => `<option ${(item?.quantidade || 1) === n + 1 ? "selected" : ""}>${n + 1}</option>`).join("")}</select></div>
+      </div>
+      <div class="dupla">
+        <div><label for="e-preco">Preço aprox. <small>(opcional)</small></label><input id="e-preco" inputmode="decimal" placeholder="250" value="${item?.preco != null ? String(item.preco).replace(".", ",") : ""}"></div>
+        <div><label for="e-link">Link de referência <small>(opcional)</small></label><input id="e-link" type="url" placeholder="https://…" value="${esc(item?.link || "")}"></div>
+      </div>
+      <div><label for="e-desc">Detalhes <small>(cor, tamanho, voltagem…)</small></label><textarea id="e-desc" maxlength="200">${esc(item?.descricao || "")}</textarea></div>
+      ${htmlFoto(false)}
+      ${item && item.reservas.length ? `<p class="dica">${item.reservas.length} ${item.reservas.length === 1 ? "pessoa já reservou" : "pessoas já reservaram"} este presente.</p>` : ""}
+      <p class="erro" style="margin:0"></p>
+      <div class="modal-botoes"><button class="btn claro" type="button" data-fechar>Cancelar</button><button class="btn" type="submit">Salvar</button></div>
+    </form>`);
+  const foto = campoFoto(m, item?.imagem || "", false, () => m.querySelector("#e-cat").value);
+  m.querySelector("#e-cat").onchange = foto.repintar;
+  m.querySelector("#e-nome").focus();
+  m.querySelector("form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const erro = m.querySelector(".erro"), b = m.querySelector('[type="submit"]');
+    const preco = lerValor(m.querySelector("#e-preco").value);
+    if (Number.isNaN(preco)) return erro.textContent = "Preço inválido.";
+    b.disabled = true; erro.textContent = "";
+    try {
+      await api("POST", { acao: "salvarItem", id: item?.id, nome: m.querySelector("#e-nome").value, categoria: m.querySelector("#e-cat").value,
+        quantidade: Number(m.querySelector("#e-qtd").value), preco, link: m.querySelector("#e-link").value.trim(),
+        descricao: m.querySelector("#e-desc").value, imagem: foto.valor() });
+      fechar(); await carregar(); avisar(item ? "Presente atualizado ✓" : "Presente adicionado ✓");
+    } catch (err) { erro.textContent = err.message; b.disabled = false; }
+  });
+}
+
+function editarCota(cota) {
+  const atualIcone = cota?.icone || "aviao";
+  const { m, fechar } = abrirModal(`
+    <h2>${cota ? "Editar cota" : "Nova cota"}</h2>
+    <form class="form" novalidate>
+      <div><label for="e-nome">Nome</label><input id="e-nome" maxlength="80" value="${esc(cota?.nome || "")}" placeholder="Ex.: Passagens da lua de mel"></div>
+      <div><label for="e-desc">Descrição <small>(opcional)</small></label><textarea id="e-desc" maxlength="200">${esc(cota?.descricao || "")}</textarea></div>
+      <div class="dupla">
+        <div><label for="e-valor">Valor de 1 cota</label><input id="e-valor" inputmode="decimal" placeholder="150" value="${cota ? String(cota.valor).replace(".", ",") : ""}"></div>
+        <div><label for="e-meta">Meta <small>(opcional)</small></label><input id="e-meta" inputmode="decimal" placeholder="3000" value="${cota?.meta != null ? String(cota.meta).replace(".", ",") : ""}"></div>
+      </div>
+      <fieldset><legend>Ícone</legend><div class="icones">${Object.keys(ROTULOS_ICONES).map(k => `
+        <label><input type="radio" name="icone" value="${k}" ${k === atualIcone ? "checked" : ""}><span>${icone(k)}${ROTULOS_ICONES[k]}</span></label>`).join("")}</div></fieldset>
+      ${htmlFoto(true)}
+      <p class="erro" style="margin:0"></p>
+      <div class="modal-botoes"><button class="btn claro" type="button" data-fechar>Cancelar</button><button class="btn" type="submit">Salvar</button></div>
+    </form>`);
+  const iconeSel = () => m.querySelector('[name="icone"]:checked')?.value || "presente";
+  const foto = campoFoto(m, cota?.imagem || "", true, iconeSel);
+  m.querySelectorAll('[name="icone"]').forEach(r => r.onchange = foto.repintar);
+  m.querySelector("#e-nome").focus();
+  m.querySelector("form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const erro = m.querySelector(".erro"), b = m.querySelector('[type="submit"]');
+    const valor = lerValor(m.querySelector("#e-valor").value), meta = lerValor(m.querySelector("#e-meta").value);
+    if (!(valor > 0)) return erro.textContent = "Informe o valor de uma cota.";
+    if (Number.isNaN(meta)) return erro.textContent = "Meta inválida.";
+    b.disabled = true; erro.textContent = "";
+    try {
+      await api("POST", { acao: "salvarCota", id: cota?.id, nome: m.querySelector("#e-nome").value, descricao: m.querySelector("#e-desc").value,
+        valor, meta, icone: iconeSel(), imagem: foto.valor() });
+      fechar(); await carregar(); avisar(cota ? "Cota atualizada ✓" : "Cota adicionada ✓");
+    } catch (err) { erro.textContent = err.message; b.disabled = false; }
+  });
+}
+
+/* ===== Pix e WhatsApp ===== */
+const mascaraTel = v => { let d = String(v).replace(/\D/g, ""); if (d.length > 11 && d.startsWith("55")) d = d.slice(2); d = d.slice(0, 11);
+  return d.length > 6 ? `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}` : d.length > 2 ? `(${d.slice(0, 2)}) ${d.slice(2)}` : d; };
+function preencherConfig() {
+  const c = dados.config;
+  $("c-tipo").value = c.pixTipo || ""; $("c-chave").value = c.pixTipo === "telefone" ? mascaraTel(c.pixChave) : c.pixChave || "";
+  $("c-nome").value = c.pixNome || ""; $("c-cidade").value = c.pixCidade || "";
+  $("c-zap").value = c.whatsapp ? mascaraTel(c.whatsapp) : ""; $("c-entrega").value = c.textoEntrega || ""; $("c-mostrar").checked = c.mostrarArrecadado !== false;
+  $("c-erro").textContent = ""; $("qr-teste").hidden = true;
+}
+$("c-zap").addEventListener("input", e => e.target.value = mascaraTel(e.target.value));
+const lerConfigForm = () => ({ pixTipo: $("c-tipo").value, pixChave: $("c-chave").value, pixNome: $("c-nome").value, pixCidade: $("c-cidade").value,
+  whatsapp: $("c-zap").value, textoEntrega: $("c-entrega").value, mostrarArrecadado: $("c-mostrar").checked });
+$("form-config").addEventListener("submit", async e => {
+  e.preventDefault(); const b = $("c-salvar"); b.disabled = true; $("c-erro").textContent = "";
+  try { await api("POST", { acao: "salvarConfig", ...lerConfigForm() }); await carregar(); avisar("Pix e WhatsApp salvos ✓"); }
+  catch (err) { $("c-erro").textContent = err.message; }
+  finally { b.disabled = false; }
+});
+$("testar-pix").onclick = async () => {
+  const c = dados.config;
+  if (!c.pixChave) return $("c-erro").textContent = "Salve uma chave Pix primeiro.";
+  const codigo = PixKK.gerar({ chave: c.pixChave, nome: c.pixNome, cidade: c.pixCidade, valor: 1, txid: "KKTESTE" });
+  $("qr-codigo").value = codigo; $("qr-teste").hidden = false;
+  try {
+    if (!window.qrcode) await carregarScript(QR_LIB);
+    const q = qrcode(0, "M"); q.addData(codigo); q.make(); $("qr").innerHTML = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+  } catch { $("qr").innerHTML = ""; }
+};
+
+/* ===== Lista de agradecimentos (Excel com o logo) ===== */
+function carregarScript(src) {
+  return new Promise((ok, falha) => {
+    const s = document.createElement("script"); s.src = src; s.onload = ok;
+    s.onerror = () => falha(new Error("Não foi possível carregar. Verifique a internet.")); document.head.appendChild(s);
+  });
+}
+async function logoBase64() {
+  try {
+    const r = await fetch("logo-kk.png"); if (!r.ok) return null;
+    const b = new Uint8Array(await r.arrayBuffer()); let s = "";
+    for (let i = 0; i < b.length; i += 8192) s += String.fromCharCode(...b.subarray(i, i + 8192));
+    return btoa(s);
+  } catch { return null; }
+}
+const horaLocal = d => { const t = new Date(d); return new Date(t.getTime() - t.getTimezoneOffset() * 60000); };
+
+async function gerarAgradecimentos() {
+  const VINHO = "FF7A1325", CREME = "FFF6F0E8", ROSA = "FFFBF1F2", LINHA = "FFE3C9CC";
+  const linhas = [
+    ...dados.itens.flatMap(i => i.reservas.map(r => ({ nome: r.nome, presente: i.nome, tipo: "Presente", valor: i.preco, recado: r.recado, data: r.criadoEm, status: "" }))),
+    ...dados.cotas.flatMap(c => c.contribuicoes.map(x => ({ nome: x.nome, presente: c.nome, tipo: "Pix · " + x.codigo, valor: x.valor, recado: x.recado, data: x.criadoEm, status: x.status === "recebido" ? "Conferido" : "A conferir" }))),
+  ].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" }));
+
+  const wb = new ExcelJS.Workbook(); wb.creator = "Kauan & Karol"; wb.created = new Date();
+  const logo = await logoBase64(); const idLogo = logo ? wb.addImage({ base64: logo, extension: "png" }) : null;
+  const borda = { style: "thin", color: { argb: LINHA } }, bordas = { top: borda, left: borda, bottom: borda, right: borda };
+  const ws = wb.addWorksheet("Agradecimentos", { properties: { tabColor: { argb: VINHO } } });
+  const larg = [6, 26, 34, 26, 14, 40, 13, 14];
+  ws.columns = larg.map(w => ({ width: w }));
+  for (let r = 1; r <= 9; r++) { ws.mergeCells(`A${r}:H${r}`); ws.getRow(r).getCell(1).alignment = { horizontal: "center", vertical: "middle" }; }
+  [1, 2, 3, 4, 5].forEach(r => ws.getRow(r).height = 17.5);
+  if (idLogo != null) {
+    const px = larg.map(w => Math.round(w * 7 + 5)), total = px.reduce((s, v) => s + v, 0);
+    let alvo = (total - 80) / 2, col = 0; while (col < px.length - 1 && alvo > px[col]) { alvo -= px[col]; col++; }
+    ws.addImage(idLogo, { tl: { col: col + alvo / px[col], row: 0.2 }, ext: { width: 80, height: 100 }, editAs: "oneCell" });
+  }
+  const txt = (cel, v, f, h) => { const c = ws.getCell(cel); c.value = v; c.font = { name: "Georgia", color: { argb: VINHO }, ...f }; if (h) ws.getRow(+cel.slice(1)).height = h; };
+  txt("A6", "Kauan & Karol", { size: 24, italic: true }, 34);
+  txt("A7", "Lista de agradecimentos", { size: 12, bold: true }, 20);
+  txt("A8", "28/11/2026  ·  Obrigado por fazerem parte do nosso começo ♡", { size: 10.5, color: { argb: "FF9B2B3A" } });
+  const soma = linhas.filter(l => l.tipo.startsWith("Pix")).reduce((s, l) => s + (l.valor || 0), 0);
+  txt("A9", `${linhas.length} presentes · ${reais(soma)} em Pix`, { size: 10, italic: true, color: { argb: "FF9B2B3A" } }, 18);
+  ws.getRow(10).height = 8;
+  const t = ws.getRow(11); t.values = ["Nº", "Convidado", "Presente", "Tipo", "Valor", "Recado", "Data", "Agradecido"]; t.height = 24;
+  t.eachCell(c => { c.font = { name: "Georgia", size: 11, bold: true, color: { argb: CREME } }; c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: VINHO } }; c.alignment = { horizontal: "center", vertical: "middle" }; c.border = bordas; });
+  linhas.forEach((l, i) => {
+    const r = ws.getRow(12 + i);
+    r.values = [i + 1, l.nome, l.presente, l.tipo + (l.status ? ` (${l.status})` : ""), l.valor ?? "", l.recado || "", horaLocal(l.data), "☐"];
+    r.eachCell({ includeEmpty: true }, (c, k) => {
+      c.border = bordas; c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 ? ROSA : "FFFFFFFF" } };
+      c.font = { name: "Georgia", size: 10.5, color: { argb: "FF4E0B17" } };
+      c.alignment = { vertical: "top", wrapText: k === 3 || k === 6, horizontal: k === 1 || k === 8 ? "center" : "left" };
+    });
+    r.getCell(2).font = { name: "Georgia", size: 11, bold: true, color: { argb: "FF4E0B17" } };
+    r.getCell(5).numFmt = '"R$" #,##0.00'; r.getCell(7).numFmt = "dd/mm/yyyy";
+    r.getCell(8).font = { name: "Segoe UI Symbol", size: 14, color: { argb: VINHO } };
+  });
+  if (!linhas.length) { ws.mergeCells("A12:H12"); ws.getCell("A12").value = "Nenhum presente registrado ainda."; ws.getCell("A12").alignment = { horizontal: "center" }; }
+  ws.pageSetup = { paperSize: 9, orientation: "landscape", fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true, printTitlesRow: "11:11",
+    margins: { left: .4, right: .4, top: .5, bottom: .6, header: .2, footer: .3 } };
+  ws.headerFooter.oddFooter = '&L&"Georgia,Italic"&9Kauan && Karol · 28/11/2026&R&"Georgia"&9Página &P de &N';
+  ws.views = [{ state: "frozen", ySplit: 11, showGridLines: false }];
+
+  const buf = await wb.xlsx.writeBuffer();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+  a.download = "agradecimentos-kauan-karol.xlsx"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+$("agradecimentos").onclick = async () => {
+  const b = $("agradecimentos"), t = b.textContent; b.disabled = true; b.textContent = "Gerando…";
+  try { if (!window.ExcelJS) await carregarScript(CDN_EXCELJS); await gerarAgradecimentos(); avisar("Lista de agradecimentos baixada ✓"); }
+  catch (e) { avisar(e.message); } finally { b.disabled = false; b.textContent = t; }
+};
+
+if (senha) carregar();
+</script>
+</body>
+</html>
