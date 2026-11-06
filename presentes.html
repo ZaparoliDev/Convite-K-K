@@ -76,6 +76,16 @@ a{color:inherit}
 .aba small{min-width:22px;padding:3px 7px;font:700 .8rem/1 "Cormorant Garamond",serif;border-radius:999px;background:rgba(122,19,37,.1);transition:background .35s}
 .aba[aria-selected="true"]{color:var(--papel)}
 .aba[aria-selected="true"] small{background:rgba(251,246,240,.22)}
+/* aba bloqueada: cadeado no lugar do contador e balanço ao tocar */
+.aba .cadeado{display:none;place-items:center;width:34px;height:34px;margin:-4px -2px -4px 0;border-radius:50%;color:var(--bordo);background:rgba(122,19,37,.12)}
+.aba .cadeado svg{width:22px;height:22px}
+.aba.bloqueada{color:rgba(122,19,37,.6);cursor:not-allowed}
+.aba.bloqueada .cadeado{display:inline-grid}
+.aba.bloqueada small{display:none}
+.aba.tremendo{animation:trava .55s cubic-bezier(.36,.07,.19,.97)}
+.aba.tremendo .cadeado{animation:cadeado .55s ease}
+@keyframes trava{0%,100%{transform:translateX(0)}15%{transform:translateX(-8px)}30%{transform:translateX(7px)}45%{transform:translateX(-6px)}60%{transform:translateX(4px)}75%{transform:translateX(-2px)}90%{transform:translateX(1px)}}
+@keyframes cadeado{0%,100%{rotate:0deg}20%{rotate:-18deg}40%{rotate:14deg}60%{rotate:-10deg}80%{rotate:5deg}}
 
 /* ===== A folha (a lista inteira num papel, como o convite) ===== */
 main{width:min(100% - 24px,1000px);margin:0 auto;padding:20px 0 36px}
@@ -349,6 +359,7 @@ details.outro-aparelho .dentro{padding:0 14px 14px;text-align:center}
     <button class="aba" role="tab" id="aba-cotas" aria-controls="painel-cotas" aria-selected="false" tabindex="-1">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4 3 11.2l6.3 2.2L21 4Zm0 0-11.7 9.4.2 6.6 3.4-4.3L18 19l3-15Z"/></svg>
       <span>Lua de mel<span class="extra"> e cotas</span></span> <small id="n-cotas">·</small>
+      <span class="cadeado" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="11" rx="2.2"/><path d="M7.8 10.5V7.3a4.2 4.2 0 0 1 8.4 0v3.2"/><circle cx="12" cy="15.4" r="1.3" fill="currentColor" stroke="none"/><path d="M12 16.4v2"/></svg></span>
     </button>
   </div>
 </nav>
@@ -610,8 +621,24 @@ function desenharCotas() {
 }
 
 /* ===== Abas ===== */
-function abrirAba(qual, foco) {
+// Lua de mel travada: troque para false quando quiserem liberar as cotas
+const LUA_DE_MEL_BLOQUEADA = true;
+if (LUA_DE_MEL_BLOQUEADA) {
+  const a = $("aba-cotas");
+  a.classList.add("bloqueada"); a.setAttribute("aria-disabled", "true");
+  a.setAttribute("aria-label", "Lua de mel e cotas, bloqueado");
+}
+function balancarTrava() {
+  const a = $("aba-cotas");
+  a.classList.remove("tremendo"); void a.offsetWidth; a.classList.add("tremendo");
+  try { navigator.vibrate?.([30, 40, 30]); } catch {}
+  if (!MOVIMENTO) avisar("Lua de mel bloqueada por enquanto");
+}
+$("aba-cotas").addEventListener("animationend", e => { if (e.animationName === "trava") e.currentTarget.classList.remove("tremendo"); });
+
+function abrirAba(qual, foco, semAviso) {
   const cotas = qual === "cotas";
+  if (cotas && LUA_DE_MEL_BLOQUEADA) { if (!semAviso) balancarTrava(); return; }
   $("trilho-abas").dataset.ativa = cotas ? "cotas" : "itens";
   $("aba-itens").setAttribute("aria-selected", !cotas); $("aba-cotas").setAttribute("aria-selected", cotas);
   $("aba-itens").tabIndex = cotas ? -1 : 0; $("aba-cotas").tabIndex = cotas ? 0 : -1;
@@ -1008,7 +1035,7 @@ function chuva() {
   }
 }
 
-if (location.hash === "#cotas") abrirAba("cotas");
+if (location.hash === "#cotas") abrirAba("cotas", false, true);
 atualizarMinhas();
 carregar();
 conferirMinhas();
