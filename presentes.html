@@ -622,7 +622,7 @@ function desenharCotas() {
 
 /* ===== Abas ===== */
 // Lua de mel travada: troque para false quando quiserem liberar as cotas
-const LUA_DE_MEL_BLOQUEADA = true;
+const LUA_DE_MEL_BLOQUEADA = false;
 if (LUA_DE_MEL_BLOQUEADA) {
   const a = $("aba-cotas");
   a.classList.add("bloqueada"); a.setAttribute("aria-disabled", "true");
